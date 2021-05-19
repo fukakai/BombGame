@@ -2,6 +2,8 @@ package com.example.bombgame.repository
 
 import android.content.ContentValues.TAG
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.bombgame.data.dto.Room
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
@@ -12,6 +14,13 @@ class RoomRepository private constructor() {
 
     private val roomCollection = "rooms"
     private val db = Firebase.firestore
+    private val roomListLiveData = MutableLiveData<List<Room>>()
+
+    init {
+        listenToRoomList()
+    }
+
+    fun getRoomListObserver() = roomListLiveData as LiveData<List<Room>>
 
     companion object {
         @Volatile
@@ -87,4 +96,24 @@ class RoomRepository private constructor() {
             emptyList()
         }
     }
+
+    /**
+     * Listen to the firestore database and update the roomList every time it changes.
+     */
+    private fun listenToRoomList() {
+        db.collection(roomCollection)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.w(TAG, "Could not listen to rooms collection.", e)
+                    return@addSnapshotListener
+                }
+
+                roomListLiveData.value = if (snapshot != null && !snapshot.isEmpty) {
+                    snapshot.documents.mapNotNull { it.toObject<Room>() }
+                } else {
+                    emptyList()
+                }
+            }
+    }
+
 }

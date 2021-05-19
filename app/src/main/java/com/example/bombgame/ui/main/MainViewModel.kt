@@ -1,25 +1,17 @@
 package com.example.bombgame.ui.main
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.bombgame.data.dto.Room
 import com.example.bombgame.repository.RoomRepository
 import com.example.bombgame.utils.RoomUtils
-import kotlinx.coroutines.launch
 
 
 class MainViewModel(private val roomRepository: RoomRepository) : ViewModel() {
 
     private var roomList = listOf<Room>()
-    private val roomListLiveData = MutableLiveData<List<Room>>()
+    private val roomListLiveData = roomRepository.getRoomListObserver()
 
-    init {
-        updateRoomList()
-    }
-
-    fun getRoomListObserver() = roomListLiveData as LiveData<List<Room>>
+    fun getRoomListObserver() = roomListLiveData
 
     /**
      * Call the roomRepository to add a room.
@@ -28,7 +20,6 @@ class MainViewModel(private val roomRepository: RoomRepository) : ViewModel() {
     fun addRoom(room: Room) {
         generateUniqueRoomId(room)
         roomRepository.addRoom(room)
-        updateRoomList()
     }
 
     /**
@@ -37,7 +28,6 @@ class MainViewModel(private val roomRepository: RoomRepository) : ViewModel() {
      */
     fun deleteRoom(id: String) {
         roomRepository.deleteRoom(id)
-        updateRoomList()
     }
 
     /**
@@ -45,7 +35,6 @@ class MainViewModel(private val roomRepository: RoomRepository) : ViewModel() {
      */
     fun deleteAllRooms() {
         roomRepository.deleteAllRooms()
-        updateRoomList()
     }
 
     /**
@@ -58,15 +47,5 @@ class MainViewModel(private val roomRepository: RoomRepository) : ViewModel() {
             gameId = RoomUtils.generateId()
         }
         room.gameId = gameId
-    }
-
-    /**
-     * Get the room list from the roomRepository and update the LiveData.
-     */
-    private fun updateRoomList() {
-        viewModelScope.launch {
-            roomList = roomRepository.getAllRooms()
-            roomListLiveData.value = roomList
-        }
     }
 }
