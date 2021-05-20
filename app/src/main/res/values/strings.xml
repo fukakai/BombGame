@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">BombGame</string>
+    <string name="create_room">CREATE ROOM</string>
+    <string name="delete_all_rooms">DELETE ALL ROOMS</string>
+    <string name="find_game">FIND GAME</string>
+    <string name="game_id">Game ID</string>
 </resources>
