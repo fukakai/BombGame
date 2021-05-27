@@ -41,4 +41,12 @@
         android:layout_marginTop="40dp"
         android:text="@string/find_game" />
 
+    <Button
+        android:id="@+id/game_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="500dp"
+        android:text="@string/game" />
+
 </RelativeLayout>

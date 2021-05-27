@@ -1,5 +1,6 @@
 package com.example.bombgame
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.InputFilter
 import android.widget.Button
@@ -10,6 +11,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.bombgame.data.dto.Room
+import com.example.bombgame.game.GameActivity
 import com.example.bombgame.ui.main.MainViewModel
 import com.example.bombgame.utils.InjectorUtils
 import com.example.bombgame.utils.RoomUtils
@@ -26,6 +28,7 @@ class MainActivity : AppCompatActivity() {
         val createButton = findViewById<Button>(R.id.create_room_button)
         val deleteButton = findViewById<Button>(R.id.delete_button)
         val findButton = findViewById<Button>(R.id.find_game_button)
+        val gameButton = findViewById<Button>(R.id.game_button)
         findButton.isEnabled = false
 
         val idText = findViewById<EditText>(R.id.game_id_text)
@@ -57,6 +60,11 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "Game $gameId not found !", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        gameButton.setOnClickListener {
+            val intent = Intent(this, GameActivity::class.java)
+            startActivity(intent);
         }
     }
 }
