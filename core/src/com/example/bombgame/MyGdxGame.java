@@ -65,12 +65,14 @@ public class MyGdxGame extends ApplicationAdapter {
         batch.draw(bombNormalTexture, bombX, bombY, bombWidth, bombHeight);
         batch.end();
 
-        move();
-        bounce();
-        wantToExplode();
-        touchBomb();
-        checkTime();
-        checkGameOver();
+        if(!isGameOver) {
+            move();
+            bounce();
+            wantToExplode();
+            touchBomb();
+            checkTime();
+            checkGameOver();
+        }
     }
 
     @Override
@@ -107,7 +109,7 @@ public class MyGdxGame extends ApplicationAdapter {
      * Move the Bomb
      */
     private void move() {
-        if (!isBombTouched && !isGameOver) {
+        if (!isBombTouched) {
             if (goToRight) {
                 bombX += calculateSpeed(deltaXCoef);
             } else {
@@ -132,7 +134,6 @@ public class MyGdxGame extends ApplicationAdapter {
      * @return
      */
     private float calculateSpeed(int delta) {
-        if(isGameOver){ return 0;}
         float speed = (initialBombSpeed + delta) - deceleration;
         return (speed > 0) ? speed : 0;
     }
