@@ -5,14 +5,17 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import java.util.Random;
 
 
-public class MyGdxGame extends ApplicationAdapter {
+public class BombGame extends ApplicationAdapter {
     SpriteBatch batch;
     Texture bombNormalTexture;
+    Texture bombExplodedTexture;
+    TextureRegion bombTextureRegion;
     int screenWidth;
     int screenHeight;
     int touchedX;
@@ -23,6 +26,8 @@ public class MyGdxGame extends ApplicationAdapter {
 
     float bombX;
     float bombY;
+    float bombScaleX = 1;
+    float bombScaleY = 1;
     int bombWidth = 300;
     int bombHeight = bombWidth;
     int bombMaxSize = bombWidth + 50;
@@ -36,6 +41,10 @@ public class MyGdxGame extends ApplicationAdapter {
     double screenBottom = 0;
     float inflateTime = 10f;
     float timeState;
+    float rotationPosition = 0;
+    float rotationSpeed = 50;
+    float rotationAxis = -1;
+    float rotationChoc = 10;
 
     boolean doesBombWantToExplode = false;
     boolean goToUp;
@@ -49,10 +58,13 @@ public class MyGdxGame extends ApplicationAdapter {
     @Override
     public void create() {
         batch = new SpriteBatch();
+        bombExplodedTexture = new Texture("boum.png");
         bombNormalTexture = new Texture("bomb.png");
+        bombTextureRegion = new TextureRegion(bombNormalTexture);
 
         screenWidth = Gdx.graphics.getWidth();
         screenHeight = Gdx.graphics.getHeight();
+
 
         randomStart();
         randomEnd();
@@ -62,12 +74,13 @@ public class MyGdxGame extends ApplicationAdapter {
     public void render() {
         ScreenUtils.clear(Color.WHITE);
         batch.begin();
-        batch.draw(bombNormalTexture, bombX, bombY, bombWidth, bombHeight);
+        batch.draw(bombTextureRegion, bombX, bombY, bombWidth / 2, bombHeight / 2, bombWidth, bombHeight, bombScaleX, bombScaleY, rotationPosition);
         batch.end();
 
-        if(!isGameOver) {
+        if (!isGameOver) {
             move();
             bounce();
+            perpetualRotation();
             wantToExplode();
             touchBomb();
             checkTime();
@@ -98,9 +111,9 @@ public class MyGdxGame extends ApplicationAdapter {
         if (timeState >= endOfGame) {
             isGameOver = true;
             doesBombWantToExplode = false;
-            bombNormalTexture = new Texture("boum.png");
             batch.begin();
-            batch.draw(bombNormalTexture, bombX, bombY, bombWidth, bombHeight);
+            bombTextureRegion.setTexture(bombExplodedTexture);
+            batch.draw(bombTextureRegion, bombX, bombY, bombWidth, bombHeight);
             batch.end();
         }
     }
@@ -152,19 +165,36 @@ public class MyGdxGame extends ApplicationAdapter {
         if (bombX + bombWidth >= screenWidth) {
             goToRight = false;
             friction();
+            rotate(false,false,true,false);
         }
         if (bombY + bombHeight >= screenHeight) {
             goToUp = false;
             friction();
+            rotate(false,true,false,false);
         }
         if (bombX <= screenLeft) {
             goToRight = true;
             friction();
+            rotate(true,false,false,false);
         }
         if (bombY <= screenBottom) {
             goToUp = true;
             friction();
+            rotate(false,false,false,true);
         }
+    }
+
+    private void perpetualRotation(){
+        rotationPosition += (Gdx.graphics.getDeltaTime() * rotationSpeed) * rotationAxis;
+    }
+
+    private void rotate(boolean left,boolean top,boolean right,boolean bottom) {
+        if( (left && goToUp) || (top && goToRight)|| (right && !goToUp)|| (bottom && !goToRight)){
+            rotationAxis = 1;
+        }else{
+            rotationAxis = -1;
+        }
+        rotationPosition += (rotationChoc * rotationAxis);
     }
 
     /**
