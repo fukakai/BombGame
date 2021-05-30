@@ -39,12 +39,15 @@ public class BombGame extends ApplicationAdapter {
     double frictionCoefficient = 0.07;
     double screenLeft = 0;
     double screenBottom = 0;
-    float inflateTime = 10f;
     float timeState;
     float rotationPosition = 0;
     float rotationSpeed = 50;
     float rotationAxis = -1;
     float rotationChoc = 10;
+
+    float minSecondsBeforeEnd = 5;
+    float maxSecondsBeforeEnd = 25;
+    float inflateTime = 7f;
 
     boolean doesBombWantToExplode = false;
     boolean goToUp;
@@ -280,6 +283,6 @@ public class BombGame extends ApplicationAdapter {
      * Random time before game over
      */
     private void randomEnd() {
-        endOfGame = 15 + random.nextFloat() * (45 - 15);
+        endOfGame = minSecondsBeforeEnd + random.nextFloat() * (maxSecondsBeforeEnd - minSecondsBeforeEnd);
     }
 }
