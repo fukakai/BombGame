@@ -1,5 +1,4 @@
 apply plugin: "java"
-apply plugin: 'kotlin'
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
@@ -13,11 +12,11 @@ dependencies {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
-    api "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    api "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
-    api "com.badlogicgames.gdx:gdx:$gdxVersion"
-    api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-    api "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
 }

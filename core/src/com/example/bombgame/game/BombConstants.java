@@ -1,4 +1,4 @@
-package com.example.bombgame;
+package com.example.bombgame.game;
 
 public class BombConstants {
 

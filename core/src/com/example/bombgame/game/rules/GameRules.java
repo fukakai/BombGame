@@ -1,10 +1,12 @@
-package com.example.bombgame;
+package com.example.bombgame.game.rules;
 
 import com.badlogic.gdx.Gdx;
+import com.example.bombgame.game.BombConstants;
+import com.example.bombgame.game.data.BombLiveProperties;
 
 public class GameRules {
 
-  BombLiveProperties bombLiveProperties = BombLiveProperties.getInstance();
+  private BombLiveProperties bombLiveProperties = BombLiveProperties.getInstance();
 
   public void ruleTheWorld() {
     wantsToExplode();

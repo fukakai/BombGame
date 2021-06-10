@@ -1,4 +1,4 @@
-package com.example.bombgame;
+package com.example.bombgame.game.data;
 
 /**
  * Singleton to be able to use and update the bomb properties from anywhere in the application
@@ -79,11 +79,11 @@ public class BombLiveProperties {
     this.touchedY = touchedY;
   }
 
-  public int getDeltaXCoef() {
+  public final int getDeltaXCoef() {
     return deltaXCoef;
   }
 
-  public void setDeltaXCoef(int deltaXCoef) {
+  public final void setDeltaXCoef(int deltaXCoef) {
     this.deltaXCoef = deltaXCoef;
   }
 

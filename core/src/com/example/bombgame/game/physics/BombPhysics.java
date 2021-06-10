@@ -1,10 +1,13 @@
-package com.example.bombgame;
+package com.example.bombgame.game.physics;
 
 import com.badlogic.gdx.Gdx;
+import com.example.bombgame.game.BombConstants;
+import com.example.bombgame.game.data.BombLiveProperties;
+import com.example.bombgame.game.service.BombService;
 
 public class BombPhysics {
 
-  BombLiveProperties bombLiveProperties = BombLiveProperties.getInstance();
+  private BombLiveProperties bombLiveProperties = BombLiveProperties.getInstance();
 
   public void animate() {
     move();
@@ -49,7 +52,7 @@ public class BombPhysics {
    * @param delta
    * @return
    */
-  private float calculateSpeed(int delta) {
+  private float calculateSpeed(final int delta) {
     float speed =
         (BombConstants.INITIAL_BOMB_SPEED + delta) - bombLiveProperties.getDeceleration();
     return (speed > 0) ? speed : 0;
@@ -107,7 +110,7 @@ public class BombPhysics {
    * @param right - if the bomb bounced on the right side
    * @param bottom - if the bomb bounced on the bottom
    */
-  private void rotate(boolean left, boolean top, boolean right, boolean bottom) {
+  private void rotate(final boolean left, final boolean top, final boolean right, final boolean bottom) {
     if ((left && bombLiveProperties.isGoToUp()) || (top && bombLiveProperties.isGoToRight())
         || (right && !bombLiveProperties.isGoToUp()) || (bottom && !bombLiveProperties
         .isGoToRight())) {
@@ -123,6 +126,10 @@ public class BombPhysics {
    * Apply friction coefficient when the bomb touches the edges of the screen
    */
   private void friction() {
+    // test to check if Firestore is updated every time the ball is boucing on a wall
+    BombService.getInstance().updateBombProperties();
+    // --- end of the test
+
     bombLiveProperties.setDeceleration(
         (float) (bombLiveProperties.getDeceleration() + BombConstants.FRICTION_COEFFICIENT));
   }

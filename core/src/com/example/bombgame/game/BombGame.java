@@ -1,24 +1,33 @@
-package com.example.bombgame;
+package com.example.bombgame.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.example.bombgame.game.data.BombLiveProperties;
+import com.example.bombgame.game.drawer.BombDrawer;
+import com.example.bombgame.game.drawer.PlayersDrawer;
+import com.example.bombgame.game.physics.BombPhysics;
+import com.example.bombgame.game.rules.GameRules;
+import com.example.bombgame.game.service.BombService;
 import java.util.Random;
-
 
 public class BombGame extends ApplicationAdapter {
 
-  BombLiveProperties bombLiveProperties = BombLiveProperties.getInstance();
-  GameDrawer gameDrawer;
-  BombPhysics bombPhysics;
-  GameRules gameRules;
-  Random random = new Random();
+  private BombLiveProperties bombLiveProperties = BombLiveProperties.getInstance();
+  private BombService bombService = BombService.getInstance();
+  private BombDrawer bombDrawer;
+  private PlayersDrawer playersDrawer;
+  private BombPhysics bombPhysics;
+  private GameRules gameRules;
+  private Random random = new Random();
 
+  public BombGame() {}
 
   @Override
   public void create() {
-    gameDrawer = new GameDrawer();
+    bombDrawer = new BombDrawer();
+    playersDrawer = new PlayersDrawer();
 
     bombLiveProperties.setScreenWidth(Gdx.graphics.getWidth());
     bombLiveProperties.setScreenHeight(Gdx.graphics.getHeight());
@@ -33,21 +42,22 @@ public class BombGame extends ApplicationAdapter {
   @Override
   public void render() {
     ScreenUtils.clear(Color.WHITE);
-    gameDrawer.drawBomb();
+    bombDrawer.drawBomb();
+//    playersDrawer.drawPlayers();
 
     if (!bombLiveProperties.isGameOver()) {
       bombPhysics.animate();
       gameRules.ruleTheWorld();
     } else {
-      gameDrawer.drawExplosion();
+      bombDrawer.drawExplosion();
     }
   }
 
   @Override
   public void dispose() {
-    gameDrawer.dispose();
-    gameDrawer.getBombNormalTexture().dispose();
-    gameDrawer.getBombExplosionTexture().dispose();
+    bombDrawer.dispose();
+    bombDrawer.getBombNormalTexture().dispose();
+    bombDrawer.getBombExplosionTexture().dispose();
     bombLiveProperties.reset();
   }
 

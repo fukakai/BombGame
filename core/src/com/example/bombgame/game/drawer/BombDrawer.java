@@ -1,17 +1,19 @@
-package com.example.bombgame;
+package com.example.bombgame.game.drawer;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.example.bombgame.game.BombConstants;
+import com.example.bombgame.game.data.BombLiveProperties;
 
-public class GameDrawer extends SpriteBatch {
+public class BombDrawer extends SpriteBatch {
 
-  BombLiveProperties bombLiveProperties = BombLiveProperties.getInstance();
-  Texture bombNormalTexture;
-  Texture bombExplodedTexture;
-  TextureRegion bombTextureRegion;
+  private BombLiveProperties bombLiveProperties = BombLiveProperties.getInstance();
+  private Texture bombNormalTexture;
+  private Texture bombExplodedTexture;
+  private TextureRegion bombTextureRegion;
 
-  public GameDrawer() {
+  public BombDrawer() {
     bombNormalTexture = new Texture(BombConstants.BOMB_FILE);
     bombExplodedTexture = new Texture(BombConstants.EXPLOSION_FILE);
     bombTextureRegion = new TextureRegion(bombNormalTexture);
