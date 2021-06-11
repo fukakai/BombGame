@@ -75,22 +75,26 @@ public class BombPhysics {
       bombLiveProperties.setGoToRight(false);
       friction();
       rotate(false, false, true, false);
+      bombLiveProperties.setHasJustBeenTouched(false);
     }
     if (bombLiveProperties.getBombY() + bombLiveProperties.getBombHeight()
         >= bombLiveProperties.getScreenHeight()) {
       bombLiveProperties.setGoToUp(false);
       friction();
       rotate(false, true, false, false);
+      bombLiveProperties.setHasJustBeenTouched(false);
     }
     if (bombLiveProperties.getBombX() <= BombConstants.SCREEN_LEFT) {
       bombLiveProperties.setGoToRight(true);
       friction();
       rotate(true, false, false, false);
+      bombLiveProperties.setHasJustBeenTouched(false);
     }
     if (bombLiveProperties.getBombY() <= BombConstants.SCREEN_BOTTOM) {
       bombLiveProperties.setGoToUp(true);
       friction();
       rotate(false, false, false, true);
+      bombLiveProperties.setHasJustBeenTouched(false);
     }
   }
 
@@ -172,6 +176,7 @@ public class BombPhysics {
             bombLiveProperties.getTouchedX() - bombLiveProperties.getBombWidth() / 2);
         bombLiveProperties.setBombY(
             bombLiveProperties.getTouchedY() - bombLiveProperties.getBombHeight() / 2);
+        bombLiveProperties.setHasJustBeenTouched(true);
       }
     }
     deltaVelocity();

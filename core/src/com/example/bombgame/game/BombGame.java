@@ -43,7 +43,7 @@ public class BombGame extends ApplicationAdapter {
   public void render() {
     ScreenUtils.clear(Color.WHITE);
     bombDrawer.drawBomb();
-//    playersDrawer.drawPlayers();
+    playersDrawer.drawPlayers();
 
     if (!bombLiveProperties.isGameOver()) {
       bombPhysics.animate();

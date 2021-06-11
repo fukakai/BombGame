@@ -1,10 +1,17 @@
 package com.example.bombgame.game.data;
 
+import java.util.ArrayList;
+
 /**
  * Singleton to be able to use and update the bomb properties from anywhere in the application
  */
 public class BombLiveProperties {
 
+  private String currentPlayer;
+  private String gameId;
+  private String localPlayer;
+  private ArrayList<String> playerList;
+  private boolean hasBeenTouched;
   private int screenWidth;
   private int screenHeight;
   private int touchedX;
@@ -246,5 +253,45 @@ public class BombLiveProperties {
 
   public void setEndOfGame(float endOfGame) {
     this.endOfGame = endOfGame;
+  }
+
+  public String getCurrentPlayer() {
+    return currentPlayer;
+  }
+
+  public void setCurrentBombOwner(String currentPlayer) {
+    this.currentPlayer = currentPlayer;
+  }
+
+  public String getGameId() {
+    return gameId;
+  }
+
+  public void setGameId(String gameId) {
+    this.gameId = gameId;
+  }
+
+  public String getLocalPlayer() {
+    return localPlayer;
+  }
+
+  public void setLocalPlayer(String localPlayer) {
+    this.localPlayer = localPlayer;
+  }
+
+  public boolean isHasBeenTouched() {
+    return hasBeenTouched;
+  }
+
+  public void setHasJustBeenTouched(boolean hasBeenTouched) {
+    this.hasBeenTouched = hasBeenTouched;
+  }
+
+  public ArrayList<String> getPlayerList() {
+    return playerList;
+  }
+
+  public void setPlayerList(ArrayList<String> playerList) {
+    this.playerList = playerList;
   }
 }
