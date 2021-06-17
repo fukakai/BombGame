@@ -26,14 +26,14 @@ public class BombGame extends ApplicationAdapter {
 
   @Override
   public void create() {
-    bombDrawer = new BombDrawer();
-    playersDrawer = new PlayersDrawer();
-
     bombLiveProperties.setScreenWidth(Gdx.graphics.getWidth());
     bombLiveProperties.setScreenHeight(Gdx.graphics.getHeight());
 
+    bombDrawer = new BombDrawer();
     bombPhysics = new BombPhysics();
     gameRules = new GameRules();
+    playersDrawer = new PlayersDrawer();
+    playersDrawer.initDrawPlayers();
 
     randomStart();
     randomEnd();
@@ -43,7 +43,7 @@ public class BombGame extends ApplicationAdapter {
   public void render() {
     ScreenUtils.clear(Color.WHITE);
     bombDrawer.drawBomb();
-    playersDrawer.drawPlayers();
+    playersDrawer.refreshPlayers();
 
     if (!bombLiveProperties.isGameOver()) {
       bombPhysics.animate();

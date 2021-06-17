@@ -13,6 +13,8 @@ public class FirestoreHolder {
   }
 
   public interface AndroidFirestoreInterface {
-    void updateBombDatas(String string);
+    void updateCurrentBombOwner(String string);
+    void updateBombSpeed();
+    void updateTimeFromBeginning();
   }
 }

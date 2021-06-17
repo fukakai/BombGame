@@ -14,8 +14,8 @@ public class BombConstants {
   public static double SCREEN_BOTTOM = 0;
   public static float ROTATION_SPEED = 50;
   public static float ROTATION_CHOC = 10;
-  public static float MIN_SECONDS_BEFORE_END = 5;
-  public static float MAX_SECONDS_BEFORE_END = 25;
+  public static float MIN_SECONDS_BEFORE_END = 7;
+  public static float MAX_SECONDS_BEFORE_END = 30;
   public static float INFLATE_TIME = 7f;
   public static float INITIAL_BOMB_SPEED = 7f;
 }

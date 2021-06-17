@@ -1,5 +1,7 @@
 package com.example.bombgame.game.data;
 
+import com.example.bombgame.game.modele.Coordinates;
+import com.example.bombgame.game.modele.PlayerGridModel;
 import java.util.ArrayList;
 
 /**
@@ -7,17 +9,18 @@ import java.util.ArrayList;
  */
 public class BombLiveProperties {
 
-  private String currentPlayer;
+  private String currentBombOwner;
   private String gameId;
   private String localPlayer;
   private ArrayList<String> playerList;
-  private boolean hasBeenTouched;
+  private ArrayList<PlayerGridModel> playersGrid = new ArrayList<>();
+  private boolean hasJustBeenTouched;
   private int screenWidth;
   private int screenHeight;
   private int touchedX;
   private int touchedY;
-  private int deltaXCoef;
-  private int deltaYCoef;
+  private float deltaXCoef;
+  private float deltaYCoef;
   private float bombX;
   private float bombY;
   private float bombScaleX = 1;
@@ -27,7 +30,7 @@ public class BombLiveProperties {
   private int bombMaxSize = bombWidth + 50;
   private int bombMinSize = bombWidth - 50;
   private float deceleration = 0;
-  private float timeState;
+  private float timeFromBeginning = 0;
   private float rotationPosition = 0;
 
   private double decelerationCoefficient = 0.01;
@@ -86,19 +89,19 @@ public class BombLiveProperties {
     this.touchedY = touchedY;
   }
 
-  public final int getDeltaXCoef() {
+  public final float getDeltaXCoef() {
     return deltaXCoef;
   }
 
-  public final void setDeltaXCoef(int deltaXCoef) {
+  public final void setDeltaXCoef(float deltaXCoef) {
     this.deltaXCoef = deltaXCoef;
   }
 
-  public int getDeltaYCoef() {
+  public float getDeltaYCoef() {
     return deltaYCoef;
   }
 
-  public void setDeltaYCoef(int deltaYCoef) {
+  public void setDeltaYCoef(float deltaYCoef) {
     this.deltaYCoef = deltaYCoef;
   }
 
@@ -174,12 +177,12 @@ public class BombLiveProperties {
     this.decelerationCoefficient = decelerationCoefficient;
   }
 
-  public float getTimeState() {
-    return timeState;
+  public float getTimeFromBeginning() {
+    return timeFromBeginning;
   }
 
-  public void setTimeState(float timeState) {
-    this.timeState = timeState;
+  public void setTimeFromBeginning(float timeFromBeginning) {
+    this.timeFromBeginning = timeFromBeginning;
   }
 
   public float getRotationPosition() {
@@ -255,14 +258,6 @@ public class BombLiveProperties {
     this.endOfGame = endOfGame;
   }
 
-  public String getCurrentPlayer() {
-    return currentPlayer;
-  }
-
-  public void setCurrentBombOwner(String currentPlayer) {
-    this.currentPlayer = currentPlayer;
-  }
-
   public String getGameId() {
     return gameId;
   }
@@ -279,12 +274,12 @@ public class BombLiveProperties {
     this.localPlayer = localPlayer;
   }
 
-  public boolean isHasBeenTouched() {
-    return hasBeenTouched;
+  public boolean isHasJustBeenTouched() {
+    return hasJustBeenTouched;
   }
 
   public void setHasJustBeenTouched(boolean hasBeenTouched) {
-    this.hasBeenTouched = hasBeenTouched;
+    this.hasJustBeenTouched = hasBeenTouched;
   }
 
   public ArrayList<String> getPlayerList() {
@@ -293,5 +288,46 @@ public class BombLiveProperties {
 
   public void setPlayerList(ArrayList<String> playerList) {
     this.playerList = playerList;
+  }
+
+  public ArrayList<PlayerGridModel> getPlayersGrid() {
+    return playersGrid;
+  }
+
+  public void setPlayersGrid(
+      ArrayList<PlayerGridModel> playersGrid) {
+    this.playersGrid = playersGrid;
+  }
+
+  public String getCurrentBombOwner() {
+    return currentBombOwner;
+  }
+
+  public void setCurrentBombOwner(String currentBombOwner) {
+    this.currentBombOwner = currentBombOwner;
+  }
+
+  public Coordinates getMiddleRight(){
+    return new Coordinates()
+        .withX(bombX+bombWidth)
+        .withY(bombY+bombHeight/2);
+  }
+
+  public Coordinates getMiddleLeft(){
+    return new Coordinates()
+        .withX(bombX)
+        .withY(bombY+bombHeight/2);
+  }
+
+  public Coordinates getMiddleBottom(){
+    return new Coordinates()
+        .withX(bombX+bombWidth/2)
+        .withY(bombY);
+  }
+
+  public Coordinates getMiddleTop(){
+    return new Coordinates()
+        .withX(bombX+bombWidth/2)
+        .withY(bombY+bombHeight);
   }
 }

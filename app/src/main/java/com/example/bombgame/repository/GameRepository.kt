@@ -9,17 +9,41 @@ import com.google.firebase.ktx.Firebase
 class GameRepository : FirestoreHolder.AndroidFirestoreInterface {
     private val db = Firebase.firestore
 
-    override fun updateBombDatas(string: String?) {
+    override fun updateCurrentBombOwner(string: String?) {
         db.collection(GameConstants.ROOMS)
             .document(BombLiveProperties.getInstance().gameId)
-            .update("bombLiveDataTest", string)
+            .update(GameConstants.BOMB_OWNER, string)
+    }
+
+    override fun updateBombSpeed() {
+        db.collection(GameConstants.ROOMS)
+            .document(BombLiveProperties.getInstance().gameId)
+            .update(GameConstants.DELTA_X_COEF, BombLiveProperties.getInstance().deltaXCoef)
+        db.collection(GameConstants.ROOMS)
+            .document(BombLiveProperties.getInstance().gameId)
+            .update(GameConstants.DELTA_Y_COEF, BombLiveProperties.getInstance().deltaYCoef)
+    }
+
+    override fun updateTimeFromBeginning() {
+        db.collection(GameConstants.ROOMS)
+            .document(BombLiveProperties.getInstance().gameId)
+            .update(GameConstants.TIME_FROM_BEGINNING, BombLiveProperties.getInstance().timeFromBeginning)
+    }
+
+    fun updatePlayerList(playerList: ArrayList<String>?) {
+        db.collection(GameConstants.ROOMS)
+            .document(BombLiveProperties.getInstance().gameId)
+            .update(GameConstants.PLAYER_LIST, playerList)
     }
 
     fun listenToUpdates() {
-        listenToCurrentPlayer()
+        listenToCurrentBombOwner()
+        listenToPlayerList()
+        listenToDelta()
+        listenToTimeFromBeginning();
     }
 
-    private fun listenToCurrentPlayer() {
+    private fun listenToCurrentBombOwner() {
         val docRef =
             db.collection(GameConstants.ROOMS)
                 .document(BombLiveProperties.getInstance().gameId)
@@ -31,7 +55,20 @@ class GameRepository : FirestoreHolder.AndroidFirestoreInterface {
         }
     }
 
-    fun listenToPlayerList() {
+    private fun listenToTimeFromBeginning() {
+        val docRef =
+            db.collection(GameConstants.ROOMS)
+                .document(BombLiveProperties.getInstance().gameId)
+        docRef.addSnapshotListener { snapshot, e ->
+            if (snapshot != null && snapshot.exists()) {
+                BombLiveProperties.getInstance()
+                    .timeFromBeginning =
+                    snapshot.data?.get(GameConstants.TIME_FROM_BEGINNING) as Float;
+            }
+        }
+    }
+
+    private fun listenToPlayerList() {
         val docRef =
             db.collection(GameConstants.ROOMS)
                 .document(BombLiveProperties.getInstance().gameId)
@@ -43,9 +80,17 @@ class GameRepository : FirestoreHolder.AndroidFirestoreInterface {
         }
     }
 
-    fun updatePlayerList(playerList: ArrayList<String>?) {
-        db.collection(GameConstants.ROOMS)
-            .document(BombLiveProperties.getInstance().gameId)
-            .update(GameConstants.PLAYER_LIST,playerList)
+    private fun listenToDelta() {
+        val docRef =
+            db.collection(GameConstants.ROOMS)
+                .document(BombLiveProperties.getInstance().gameId)
+        docRef.addSnapshotListener { snapshot, e ->
+            if (snapshot != null && snapshot.exists()) {
+                BombLiveProperties.getInstance().deltaXCoef =
+                    snapshot.data?.get(GameConstants.DELTA_X_COEF) as Float
+                BombLiveProperties.getInstance().deltaYCoef =
+                    snapshot.data?.get(GameConstants.DELTA_Y_COEF) as Float
+            }
+        }
     }
 }

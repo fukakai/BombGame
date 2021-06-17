@@ -19,18 +19,18 @@ public class GameRules {
    */
   private void checkTime() {
     bombLiveProperties
-        .setTimeState(bombLiveProperties.getTimeState() + Gdx.graphics.getDeltaTime());
+        .setTimeFromBeginning(bombLiveProperties.getTimeFromBeginning() + Gdx.graphics.getDeltaTime());
   }
 
   /**
    * Game Over Rules
    */
   private void checkGameOver() {
-    if (bombLiveProperties.getTimeState() + BombConstants.INFLATE_TIME > bombLiveProperties
+    if (bombLiveProperties.getTimeFromBeginning() + BombConstants.INFLATE_TIME > bombLiveProperties
         .getEndOfGame()) {
       bombLiveProperties.setBombWantsToExplode(true);
     }
-    if (bombLiveProperties.getTimeState() >= bombLiveProperties.getEndOfGame()) {
+    if (bombLiveProperties.getTimeFromBeginning() >= bombLiveProperties.getEndOfGame()) {
       bombLiveProperties.setGameOver(true);
       bombLiveProperties.setBombWantsToExplode(false);
     }

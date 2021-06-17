@@ -2,16 +2,22 @@ package com.example.bombgame.game.physics;
 
 import com.badlogic.gdx.Gdx;
 import com.example.bombgame.game.BombConstants;
+import com.example.bombgame.game.Tools;
 import com.example.bombgame.game.data.BombLiveProperties;
+import com.example.bombgame.game.modele.Coordinates;
+import com.example.bombgame.game.modele.PlayerGridModel;
 import com.example.bombgame.game.service.BombService;
 
 public class BombPhysics {
 
   private BombLiveProperties bombLiveProperties = BombLiveProperties.getInstance();
+  private BombService bombService = BombService.getInstance();
 
   public void animate() {
     move();
-    bounce();
+    if (!hitPlayer()) {
+      bounce();
+    }
     perpetualRotation();
     touchBomb();
 
@@ -26,18 +32,18 @@ public class BombPhysics {
   private void move() {
     if (!bombLiveProperties.isBombTouched()) {
       if (bombLiveProperties.isGoToRight()) {
-        bombLiveProperties.setBombX(bombLiveProperties.getBombX() + calculateSpeed(
-            bombLiveProperties.getDeltaXCoef()));
+        bombLiveProperties.setBombX(bombLiveProperties.getBombX()
+            + calculateSpeed(bombLiveProperties.getDeltaXCoef()));
       } else {
-        bombLiveProperties.setBombX(bombLiveProperties.getBombX() - calculateSpeed(
-            bombLiveProperties.getDeltaXCoef()));
+        bombLiveProperties.setBombX(bombLiveProperties.getBombX()
+            - calculateSpeed(bombLiveProperties.getDeltaXCoef()));
       }
       if (bombLiveProperties.isGoToUp()) {
-        bombLiveProperties.setBombY(bombLiveProperties.getBombY() + calculateSpeed(
-            bombLiveProperties.getDeltaYCoef()));
+        bombLiveProperties.setBombY(bombLiveProperties.getBombY()
+            + calculateSpeed(bombLiveProperties.getDeltaYCoef()));
       } else {
-        bombLiveProperties.setBombY(bombLiveProperties.getBombY() - calculateSpeed(
-            bombLiveProperties.getDeltaYCoef()));
+        bombLiveProperties.setBombY(bombLiveProperties.getBombY()
+            - calculateSpeed(bombLiveProperties.getDeltaYCoef()));
       }
       decelerate();
     }
@@ -52,7 +58,7 @@ public class BombPhysics {
    * @param delta
    * @return
    */
-  private float calculateSpeed(final int delta) {
+  private float calculateSpeed(final float delta) {
     float speed =
         (BombConstants.INITIAL_BOMB_SPEED + delta) - bombLiveProperties.getDeceleration();
     return (speed > 0) ? speed : 0;
@@ -67,30 +73,72 @@ public class BombPhysics {
   }
 
   /**
+   * If the bomb has just been touched by the player detect the bomb collisions with every current
+   * player
+   *
+   * @return a boolean to indicate the bomb has hitten a player
+   */
+  private boolean hitPlayer() {
+    if (bombLiveProperties.isHasJustBeenTouched()) {
+      for (PlayerGridModel playerGridModel : bombLiveProperties.getPlayersGrid()) {
+        if (playerGridModel.getPlayerId() != null) {
+
+          if (isBombInCollisionWithAplayer(bombLiveProperties.getMiddleBottom(),
+              playerGridModel)
+              || isBombInCollisionWithAplayer(bombLiveProperties.getMiddleRight(),
+              playerGridModel)
+              || isBombInCollisionWithAplayer(bombLiveProperties.getMiddleTop(),
+              playerGridModel)
+              || isBombInCollisionWithAplayer(bombLiveProperties.getMiddleLeft(),
+              playerGridModel)) {
+            bombService.updateBombDatas(playerGridModel.getPlayerId());
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * uses proper bomb coordinates (a dot in the middle of each side of the texture) to detect
+   * collisions with the players areas (rectangles)
+   *
+   * @param coordinates
+   * @param playerGridModel
+   * @return a boolean indicating if there is a collision between the bomb and a rectlanger (player)
+   */
+  private boolean isBombInCollisionWithAplayer(Coordinates coordinates,
+      PlayerGridModel playerGridModel) {
+    return (Tools.isBetween(coordinates.getX(), playerGridModel.getRectangle().getX(),
+        playerGridModel.getRectangle().getX() + playerGridModel.getRectangle().getWidth())
+        && Tools.isBetween(coordinates.getY(), playerGridModel.getRectangle().getY(),
+        playerGridModel.getRectangle().getY() + playerGridModel.getRectangle().getHeight()));
+  }
+
+  /**
    * Bounce the Bomb if the edges of the canvas was hitten
    */
   private void bounce() {
-    if (bombLiveProperties.getBombX() + bombLiveProperties.getBombWidth()
-        >= bombLiveProperties.getScreenWidth()) {
+    if (getBombRight() >= bombLiveProperties.getScreenWidth()) {
       bombLiveProperties.setGoToRight(false);
       friction();
       rotate(false, false, true, false);
       bombLiveProperties.setHasJustBeenTouched(false);
     }
-    if (bombLiveProperties.getBombY() + bombLiveProperties.getBombHeight()
-        >= bombLiveProperties.getScreenHeight()) {
+    if (getBombTop() >= bombLiveProperties.getScreenHeight()) {
       bombLiveProperties.setGoToUp(false);
       friction();
       rotate(false, true, false, false);
       bombLiveProperties.setHasJustBeenTouched(false);
     }
-    if (bombLiveProperties.getBombX() <= BombConstants.SCREEN_LEFT) {
+    if (getBombLeft() <= BombConstants.SCREEN_LEFT) {
       bombLiveProperties.setGoToRight(true);
       friction();
       rotate(true, false, false, false);
       bombLiveProperties.setHasJustBeenTouched(false);
     }
-    if (bombLiveProperties.getBombY() <= BombConstants.SCREEN_BOTTOM) {
+    if (getBombBottom() <= BombConstants.SCREEN_BOTTOM) {
       bombLiveProperties.setGoToUp(true);
       friction();
       rotate(false, false, false, true);
@@ -109,12 +157,14 @@ public class BombPhysics {
 
   /**
    * Rotates the bomb regarding its direction
-   * @param left - if the bomb bounced on the left side
-   * @param top - if the bomb bounced on the top
-   * @param right - if the bomb bounced on the right side
+   *
+   * @param left   - if the bomb bounced on the left side
+   * @param top    - if the bomb bounced on the top
+   * @param right  - if the bomb bounced on the right side
    * @param bottom - if the bomb bounced on the bottom
    */
-  private void rotate(final boolean left, final boolean top, final boolean right, final boolean bottom) {
+  private void rotate(final boolean left, final boolean top, final boolean right,
+      final boolean bottom) {
     if ((left && bombLiveProperties.isGoToUp()) || (top && bombLiveProperties.isGoToRight())
         || (right && !bombLiveProperties.isGoToUp()) || (bottom && !bombLiveProperties
         .isGoToRight())) {
@@ -130,10 +180,6 @@ public class BombPhysics {
    * Apply friction coefficient when the bomb touches the edges of the screen
    */
   private void friction() {
-    // test to check if Firestore is updated every time the ball is boucing on a wall
-    BombService.getInstance().updateBombProperties();
-    // --- end of the test
-
     bombLiveProperties.setDeceleration(
         (float) (bombLiveProperties.getDeceleration() + BombConstants.FRICTION_COEFFICIENT));
   }
@@ -191,8 +237,25 @@ public class BombPhysics {
       bombLiveProperties.setGoToRight((Gdx.input.getDeltaX() > 0) ? true : false);
       bombLiveProperties.setGoToUp((Gdx.input.getDeltaY() > 0) ? false : true);
 
-      bombLiveProperties.setDeltaXCoef(Math.abs(Gdx.input.getDeltaX()) / 5);
-      bombLiveProperties.setDeltaYCoef(Math.abs(Gdx.input.getDeltaY()) / 5);
+      bombLiveProperties.setDeltaXCoef(Math.abs(Gdx.input.getDeltaX()) / 5L);
+      bombLiveProperties.setDeltaYCoef(Math.abs(Gdx.input.getDeltaY()) / 5L);
     }
   }
+
+  private float getBombRight() {
+    return bombLiveProperties.getBombX() + bombLiveProperties.getBombWidth();
+  }
+
+  private float getBombTop() {
+    return bombLiveProperties.getBombY() + bombLiveProperties.getBombHeight();
+  }
+
+  private float getBombLeft() {
+    return bombLiveProperties.getBombX();
+  }
+
+  private float getBombBottom() {
+    return bombLiveProperties.getBombY();
+  }
+
 }
