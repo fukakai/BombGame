@@ -24,9 +24,10 @@ class GameActivity : AndroidApplication() {
         BombLiveProperties.getInstance().setLocalPlayer("Romain")
         BombLiveProperties.getInstance().setGameId("QTUUOH")
 
-        gameRepository.updateCurrentBombOwner("Romain");
         gameRepository.updatePlayerList(playerList)
         gameRepository.updateCurrentBombOwner("Romain")
+        gameRepository.reinitialiseTimeFromBeginning()
+        gameRepository.reinitialiseDeltasToDefault()
 
         // Game Live Properties Listener
         gameRepository.listenToUpdates()

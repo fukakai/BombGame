@@ -42,15 +42,16 @@ public class BombGame extends ApplicationAdapter {
   @Override
   public void render() {
     ScreenUtils.clear(Color.WHITE);
-    bombDrawer.drawBomb();
     playersDrawer.refreshPlayers();
-
-    if (!bombLiveProperties.isGameOver()) {
-      bombPhysics.animate();
-      gameRules.ruleTheWorld();
-    } else {
-      bombDrawer.drawExplosion();
+    if(bombLiveProperties.getCurrentBombOwner().equals(bombLiveProperties.getLocalPlayer())) {
+      bombDrawer.drawBomb();
+      if (!bombLiveProperties.isGameOver()) {
+        bombPhysics.animate();
+      } else {
+        bombDrawer.drawExplosion();
+      }
     }
+    gameRules.ruleTheWorld();
   }
 
   @Override
