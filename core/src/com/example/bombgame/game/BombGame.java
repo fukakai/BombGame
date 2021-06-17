@@ -42,7 +42,6 @@ public class BombGame extends ApplicationAdapter {
   @Override
   public void render() {
     ScreenUtils.clear(Color.WHITE);
-    playersDrawer.refreshPlayers();
     if(bombLiveProperties.getCurrentBombOwner().equals(bombLiveProperties.getLocalPlayer())) {
       bombDrawer.drawBomb();
       if (!bombLiveProperties.isGameOver()) {
@@ -51,6 +50,7 @@ public class BombGame extends ApplicationAdapter {
         bombDrawer.drawExplosion();
       }
     }
+    playersDrawer.refreshPlayers();
     gameRules.ruleTheWorld();
   }
 
