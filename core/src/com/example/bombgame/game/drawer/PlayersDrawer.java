@@ -151,7 +151,9 @@ public class PlayersDrawer extends ShapeRenderer {
   public void initDrawPlayers() {
     if (bombLiveProperties.getPlayerList() != null) {
       for (String playerId : bombLiveProperties.getPlayerList()) {
-        drawPlayer(playerId, getRandomPlayerGridModel(playerId));
+        if(!playerId.equals(bombLiveProperties.getLocalPlayer())) {
+          drawPlayer(playerId, getRandomPlayerGridModel(playerId));
+        }
       }
     }
   }
