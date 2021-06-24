@@ -1,4 +1,4 @@
-package com.example.bombgame.data.dto
+package com.example.bombgame.game.dto;
 
 data class Room(
     var bombState: String = "",
