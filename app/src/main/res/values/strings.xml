@@ -5,4 +5,16 @@
     <string name="find_game">FIND GAME</string>
     <string name="game_id">Game ID</string>
     <string name="game">Game</string>
+    <!-- Facebook application ID and custom URL scheme (app ID prefixed by 'fb'). -->
+    <string name="facebook_application_id" translatable="false">223061769366857</string>
+    <string name="facebook_login_protocol_scheme" translatable="false">fb223061769366857</string>
+    <string name="log_in">LOG IN</string>
+    <string name="username">Username</string>
+    <string name="log_out">LOG OUT</string>
+    <string name="ready">Ready</string>
+    <string name="leave">Leave</string>
+    <string name="change_username">Change your username</string>
+    <string name="players_list">Players list</string>
+    <string name="letters_and_digits">abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789</string>
+    <string name="start">START</string>
 </resources>

@@ -1,26 +1,34 @@
 package com.example.bombgame.repository
 
+import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.bombgame.data.dto.Player
 import com.example.bombgame.data.dto.Room
+import com.example.bombgame.utils.Constants.PLAYER_LIST_KEY
+import com.example.bombgame.utils.Constants.ROOMS_COLLECTION
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 
+
 class RoomRepository private constructor() {
 
-    private val roomCollection = "rooms"
     private val db = Firebase.firestore
     private val roomListLiveData = MutableLiveData<List<Room>>()
+    private val currentRoomLiveData = MutableLiveData<Room>()
+    private val playerListLiveData = MutableLiveData<List<Player>>()
 
     init {
         listenToRoomList()
     }
 
     fun getRoomListObserver() = roomListLiveData as LiveData<List<Room>>
+    fun getCurrentRoomObserver() = currentRoomLiveData as LiveData<Room>
+    fun getPlayerListObserver() = playerListLiveData as LiveData<List<Player>>
 
     companion object {
         @Volatile
@@ -37,11 +45,10 @@ class RoomRepository private constructor() {
      * @param room The room to add
      */
     fun addRoom(room: Room) {
-        db.collection(roomCollection)
-            .add(room)
-            .addOnSuccessListener { roomReference ->
-                Log.d(TAG, "Room added with ID ${roomReference.id}")
-            }
+        db.collection(ROOMS_COLLECTION)
+            .document(room.gameId)
+            .set(room)
+            .addOnSuccessListener { Log.d(TAG, "Room added with ID ${room.gameId}") }
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error adding room", e)
             }
@@ -52,7 +59,7 @@ class RoomRepository private constructor() {
      * @param id The id of the room to delete.
      */
     fun deleteRoom(id: String) {
-        db.collection(roomCollection)
+        db.collection(ROOMS_COLLECTION)
             .document(id)
             .delete()
             .addOnSuccessListener {
@@ -64,10 +71,26 @@ class RoomRepository private constructor() {
     }
 
     /**
+     * Add a player to a room with the firestore database.
+     * @param room The player to add
+     */
+    fun updatePlayersList(gameId: String, playersList: List<Player>) {
+        db.collection(ROOMS_COLLECTION)
+            .document(gameId)
+            .update(PLAYER_LIST_KEY, playersList)
+            .addOnSuccessListener {
+                Log.d(TAG, "Player added")
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "Error adding player", e)
+            }
+    }
+
+    /**
      * Delete all rooms from the firestore database.
      */
     fun deleteAllRooms() {
-        db.collection(roomCollection)
+        db.collection(ROOMS_COLLECTION)
             .get()
             .addOnSuccessListener { rooms ->
                 for (room in rooms) {
@@ -86,7 +109,7 @@ class RoomRepository private constructor() {
      */
     suspend fun getAllRooms(): List<Room> {
         return try {
-            db.collection(roomCollection)
+            db.collection(ROOMS_COLLECTION)
                 .get()
                 .await()
                 .documents
@@ -98,10 +121,28 @@ class RoomRepository private constructor() {
     }
 
     /**
+     * Return a room from the firestore database.
+     * @param id the id of the room you want to get
+     * @return A room.
+     */
+    suspend fun getRoom(id: String): Room? {
+        return try {
+            (db.collection(ROOMS_COLLECTION)
+                .document(id)
+                .get()
+                .await()
+                .toObject())
+        } catch (e: Exception) {
+            Log.w(TAG, "Error getting room.", e)
+            null
+        }
+    }
+
+    /**
      * Listen to the firestore database and update the roomList every time it changes.
      */
     private fun listenToRoomList() {
-        db.collection(roomCollection)
+        db.collection(ROOMS_COLLECTION)
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
                     Log.w(TAG, "Could not listen to rooms collection.", e)
@@ -116,4 +157,42 @@ class RoomRepository private constructor() {
             }
     }
 
+    /**
+     * Delete a player of a room from the firestore database.
+     * @param id The id of the room to delete.
+     */
+    fun deletePlayerFromRoom(playerUsername: String, roomId: String) {
+        val updatedList = playerListLiveData.value?.filter { it.username != playerUsername }
+
+        db.collection(ROOMS_COLLECTION)
+            .document(roomId)
+            .update(PLAYER_LIST_KEY, updatedList)
+            .addOnSuccessListener {
+                Log.d(ContentValues.TAG, "Player $playerUsername successfully deleted.")
+            }
+            .addOnFailureListener { e ->
+                Log.w(ContentValues.TAG, "Error deleting player $playerUsername", e)
+            }
+    }
+
+    /**
+     * Listen to the firestore database for players and update the playerList every time it changes.
+     */
+    fun listenToPlayerList(gameId: String) {
+        db.collection(ROOMS_COLLECTION)
+            .document(gameId)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.w(ContentValues.TAG, "Could not listen to players collection.", e)
+                    return@addSnapshotListener
+                }
+
+                val playersList = snapshot?.toObject<Room>()?.playerList
+                playerListLiveData.value = if (!playersList.isNullOrEmpty()) {
+                    playersList
+                } else {
+                    emptyList()
+                }
+            }
+    }
 }
