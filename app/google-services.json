@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "171819841120-mkho5fd4dvituhak456qd2u4u05t0t81.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.bombgame",
+            "certificate_hash": "eb5b8cf0266621d7a499ca60efb1eb356d86dc83"
+          }
+        },
+        {
           "client_id": "171819841120-r8kl68ruit8nu8d6v576k28brrc9o42p.apps.googleusercontent.com",
           "client_type": 3
         }
