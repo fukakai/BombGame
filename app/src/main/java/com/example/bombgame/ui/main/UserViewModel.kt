@@ -31,9 +31,7 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
     }
 
     fun updateUser(user: User, username: String) {
-        if (user.id != "") {
-            user.username = username
-            userRepository.updateUser(user)
-        }
+        user.username = username
+        userRepository.updateUser(user)
     }
 }

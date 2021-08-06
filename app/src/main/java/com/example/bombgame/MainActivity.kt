@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.bombgame.data.dto.Room
 import com.example.bombgame.data.dto.User
 import com.example.bombgame.game.GameActivity
+import com.example.bombgame.models.Subscription
 import com.example.bombgame.ui.main.RoomViewModel
 import com.example.bombgame.ui.main.RoomViewModelFactory
 import com.example.bombgame.ui.main.UserViewModel
@@ -137,16 +138,21 @@ class MainActivity : AppCompatActivity() {
 
         findButton.setOnClickListener {
             val gameId = idText.text.toString()
-            var room: Room?
 
             if (RoomUtils.isExistingRoom(gameId, roomList)) {
-                userViewModel.updateUser(user, usernameText.text.toString())
+                if (isLoggedIn()) {
+                    userViewModel.updateUser(user, usernameText.text.toString())
+                } else {
+                    user.username = usernameText.text.toString()
+                }
+                var usernameTaken: Boolean
                 CoroutineScope(EmptyCoroutineContext).launch {
                     withContext(
                         Dispatchers.Default
-                    ) { room = roomViewModel.getRoom(gameId) }
-                    if (roomViewModel.addPlayerToRoom(user, room!!)) {
-                        goToLobby(user.username, room?.gameId!!)
+                    ) { usernameTaken = roomViewModel.isUsernameTaken(gameId, user.username) }
+                    if (!usernameTaken) {
+                        roomViewModel.addPlayerToRoom(user, gameId)
+                        goToLobby(user.username, gameId)
                     } else {
                         withContext(Dispatchers.Main) {
                             Toast.makeText(
@@ -201,7 +207,13 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, LobbyActivity::class.java)
         intent.putExtra(PLAYER_USERNAME_KEY, playerId)
         intent.putExtra(ROOM_ID_KEY, roomId)
-        roomViewModel.listenToPlayersList(roomId)
+        roomViewModel.listenToRoom(roomId)
+        roomViewModel.listenToPlayerList(roomId)
+        roomViewModel.unsubscribe(Subscription.ROOMS)
         startActivity(intent)
+    }
+
+    private fun isLoggedIn(): Boolean {
+        return user.id != ""
     }
 }
