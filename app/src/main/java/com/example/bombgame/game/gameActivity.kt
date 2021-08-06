@@ -22,7 +22,7 @@ class GameActivity : AndroidApplication() {
         playerList.add("Florian")
 
         BombLiveProperties.getInstance().setLocalPlayer("Romain")
-        BombLiveProperties.getInstance().setGameId("QTUUOH")
+        BombLiveProperties.getInstance().setGameId("AMYXZL")
 
         gameRepository.updatePlayerList(playerList)
         gameRepository.updateCurrentBombOwner("Romain")
