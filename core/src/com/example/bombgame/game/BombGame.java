@@ -42,6 +42,7 @@ public class BombGame extends ApplicationAdapter {
   @Override
   public void render() {
     ScreenUtils.clear(Color.WHITE);
+    //TODO: NullPointerException can happen here
     if(bombLiveProperties.getCurrentBombOwner().equals(bombLiveProperties.getLocalPlayer())) {
       bombDrawer.drawBomb();
       if (!bombLiveProperties.isGameOver()) {
