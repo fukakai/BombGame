@@ -25,6 +25,7 @@ import java.io.InputStreamReader
 class LobbyActivity : AppCompatActivity() {
 
     private var playerList = listOf<Player>()
+    private var gameStarted = Boolean
     private lateinit var playerUsername: String
     private lateinit var roomId: String
     private lateinit var roomViewModel: RoomViewModel
@@ -61,13 +62,21 @@ class LobbyActivity : AppCompatActivity() {
         roomViewModel = ViewModelProvider(this, roomFactory)
             .get(RoomViewModel::class.java)
 
+        roomViewModel.listenToGameStarted(roomId)
+
         roomViewModel.getPlayerListObserver().observe(this, Observer {
             playerList = it
             startButton.isEnabled = playerList.isNotEmpty() && PlayersUtils.areAllPlayersReady(playerList)
         })
 
+        roomViewModel.getGameStartedObserver().observe(this, Observer {
+            if (it) {
+                startActivity(intentStartGame)
+            }
+        })
+
         startButton.setOnClickListener {
-            startActivity(intentStartGame)
+            roomViewModel.updateStartedGame(roomId, true)
         }
 
         //TODO gridView
