@@ -24,6 +24,15 @@ import com.example.bombgame.utils.Constants.PLAYER_USERNAME_KEY
 import com.example.bombgame.utils.Constants.RC_SIGN_IN
 import com.example.bombgame.utils.Constants.ROOM_ID_KEY
 import com.example.bombgame.game.GameActivity
+import com.example.bombgame.data.dto.User
+import com.example.bombgame.ui.main.RoomViewModel
+import com.example.bombgame.ui.main.RoomViewModelFactory
+import com.example.bombgame.ui.main.UserViewModel
+import com.example.bombgame.ui.main.UserViewModelFactory
+import com.example.bombgame.utils.Constants
+import com.example.bombgame.utils.Constants.PLAYER_USERNAME_KEY
+import com.example.bombgame.utils.Constants.RC_SIGN_IN
+import com.example.bombgame.utils.Constants.ROOM_ID_KEY
 import com.example.bombgame.utils.InjectorUtils
 import com.example.bombgame.utils.RoomUtils
 import com.firebase.ui.auth.AuthUI
@@ -173,7 +182,6 @@ class MainActivity : AppCompatActivity() {
             user = User()
         }
     }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

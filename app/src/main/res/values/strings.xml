@@ -17,4 +17,5 @@
     <string name="players_list">Players list</string>
     <string name="letters_and_digits">abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789</string>
     <string name="start">START</string>
+    <!-- Facebook application ID and custom URL scheme (app ID prefixed by 'fb'). -->
 </resources>
