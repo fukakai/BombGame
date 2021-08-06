@@ -15,9 +15,11 @@ class RoomViewModel(private val roomRepository: RoomRepository) : ViewModel() {
     private val roomListLiveData = roomRepository.getRoomListObserver()
     private val currentRoomLiveData = roomRepository.getCurrentRoomObserver()
     private val playerListLiveData = roomRepository.getPlayerListObserver()
+    private val gameStartedLiveData = roomRepository.getGameStartedObserver()
 
     fun getRoomListObserver() = roomListLiveData
     fun getCurrentRoomObserver() = currentRoomLiveData
+    fun getGameStartedObserver() = gameStartedLiveData
 
     /**
      * Call the roomRepository to add a room.
@@ -114,5 +116,13 @@ class RoomViewModel(private val roomRepository: RoomRepository) : ViewModel() {
             playersList.find { it.username == playerUsername }?.ready = !isReady!!
             roomRepository.updatePlayersList(gameId, playersList)
         }
+    }
+
+    fun updateStartedGame(gameId: String, value: Boolean) {
+        roomRepository.updateStartedGame(gameId, value)
+    }
+
+    fun listenToGameStarted(gameid: String) {
+        roomRepository.listenToGameStarted(gameid)
     }
 }

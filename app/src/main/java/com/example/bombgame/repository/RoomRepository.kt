@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.bombgame.data.dto.Player
 import com.example.bombgame.data.dto.Room
+import com.example.bombgame.utils.Constants.GAME_STARTED_KEY
 import com.example.bombgame.utils.Constants.PLAYER_LIST_KEY
 import com.example.bombgame.utils.Constants.ROOMS_COLLECTION
 import com.google.firebase.firestore.ktx.firestore
@@ -21,6 +22,7 @@ class RoomRepository private constructor() {
     private val roomListLiveData = MutableLiveData<List<Room>>()
     private val currentRoomLiveData = MutableLiveData<Room>()
     private val playerListLiveData = MutableLiveData<List<Player>>()
+    private val gameStartedLiveData = MutableLiveData<Boolean>()
 
     init {
         listenToRoomList()
@@ -29,6 +31,7 @@ class RoomRepository private constructor() {
     fun getRoomListObserver() = roomListLiveData as LiveData<List<Room>>
     fun getCurrentRoomObserver() = currentRoomLiveData as LiveData<Room>
     fun getPlayerListObserver() = playerListLiveData as LiveData<List<Player>>
+    fun getGameStartedObserver() = gameStartedLiveData as LiveData<Boolean>
 
     companion object {
         @Volatile
@@ -183,7 +186,7 @@ class RoomRepository private constructor() {
             .document(gameId)
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
-                    Log.w(ContentValues.TAG, "Could not listen to players collection.", e)
+                    Log.w(TAG, "Could not listen to players collection.", e)
                     return@addSnapshotListener
                 }
 
@@ -194,5 +197,23 @@ class RoomRepository private constructor() {
                     emptyList()
                 }
             }
+    }
+
+    fun listenToGameStarted(gameId: String) {
+        db.collection(ROOMS_COLLECTION)
+            .document(gameId)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.w(TAG, "Could not listen to room $gameId.", e)
+                    return@addSnapshotListener
+                }
+                gameStartedLiveData.value = snapshot?.toObject<Room>()?.gameStarted
+            }
+    }
+
+    fun updateStartedGame(gameId: String, value: Boolean) {
+        db.collection(ROOMS_COLLECTION)
+            .document(gameId)
+            .update(GAME_STARTED_KEY, value)
     }
 }
