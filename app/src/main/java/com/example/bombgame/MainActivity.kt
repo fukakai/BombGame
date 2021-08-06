@@ -23,6 +23,16 @@ import com.example.bombgame.utils.Constants
 import com.example.bombgame.utils.Constants.PLAYER_USERNAME_KEY
 import com.example.bombgame.utils.Constants.RC_SIGN_IN
 import com.example.bombgame.utils.Constants.ROOM_ID_KEY
+import com.example.bombgame.game.GameActivity
+import com.example.bombgame.data.dto.User
+import com.example.bombgame.ui.main.RoomViewModel
+import com.example.bombgame.ui.main.RoomViewModelFactory
+import com.example.bombgame.ui.main.UserViewModel
+import com.example.bombgame.ui.main.UserViewModelFactory
+import com.example.bombgame.utils.Constants
+import com.example.bombgame.utils.Constants.PLAYER_USERNAME_KEY
+import com.example.bombgame.utils.Constants.RC_SIGN_IN
+import com.example.bombgame.utils.Constants.ROOM_ID_KEY
 import com.example.bombgame.utils.InjectorUtils
 import com.example.bombgame.utils.RoomUtils
 import com.firebase.ui.auth.AuthUI
@@ -56,6 +66,7 @@ class MainActivity : AppCompatActivity() {
         val createButton = findViewById<Button>(R.id.create_room_button)
         val deleteButton = findViewById<Button>(R.id.delete_button)
         val findButton = findViewById<Button>(R.id.find_game_button)
+        val gameButton = findViewById<Button>(R.id.game_button)
         val logInButton = findViewById<Button>(R.id.log_in_button)
         val logOutButton = findViewById<Button>(R.id.log_out_button)
         val gameButton = findViewById<Button>(R.id.game_button)
@@ -127,6 +138,11 @@ class MainActivity : AppCompatActivity() {
 
         deleteButton.setOnClickListener {
             roomViewModel.deleteAllRooms()
+        }
+
+        gameButton.setOnClickListener {
+            val intent = Intent(this, GameActivity::class.java)
+            startActivity(intent);
         }
 
         findButton.setOnClickListener {

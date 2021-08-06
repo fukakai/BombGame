@@ -4,6 +4,7 @@
     <string name="delete_all_rooms">DELETE ALL ROOMS</string>
     <string name="find_game">FIND GAME</string>
     <string name="game_id">Game ID</string>
+    <string name="game">Game</string>
     <!-- Facebook application ID and custom URL scheme (app ID prefixed by 'fb'). -->
     <string name="facebook_application_id" translatable="false">223061769366857</string>
     <string name="facebook_login_protocol_scheme" translatable="false">fb223061769366857</string>
