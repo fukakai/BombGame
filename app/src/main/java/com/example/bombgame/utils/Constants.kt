@@ -9,6 +9,6 @@ object Constants {
     const val PLAYER = "player"
     const val PLAYER_USERNAME_KEY ="playerUsername"
     const val ROOM_ID_KEY = "roomId"
-    const val PLAYER_LIST_KEY = "playerList"
+    const val PLAYER_LIST_COLLECTION = "playerList"
     const val GAME_STARTED_KEY = "gameStarted"
 }

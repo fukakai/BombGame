@@ -10,7 +10,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.example.bombgame.data.dto.Player
 import com.example.bombgame.ui.main.RoomViewModel
 import com.example.bombgame.utils.Constants.PLAYER_USERNAME_KEY
 import com.example.bombgame.utils.Constants.ROOM_ID_KEY
@@ -24,8 +23,6 @@ import java.io.InputStreamReader
 
 class LobbyActivity : AppCompatActivity() {
 
-    private var playerList = listOf<Player>()
-    private var gameStarted = Boolean
     private lateinit var playerUsername: String
     private lateinit var roomId: String
     private lateinit var roomViewModel: RoomViewModel
@@ -62,17 +59,14 @@ class LobbyActivity : AppCompatActivity() {
         roomViewModel = ViewModelProvider(this, roomFactory)
             .get(RoomViewModel::class.java)
 
-        roomViewModel.listenToGameStarted(roomId)
-
-        roomViewModel.getPlayerListObserver().observe(this, Observer {
-            playerList = it
-            startButton.isEnabled = playerList.isNotEmpty() && PlayersUtils.areAllPlayersReady(playerList)
-        })
-
-        roomViewModel.getGameStartedObserver().observe(this, Observer {
-            if (it) {
+        roomViewModel.getCurrentRoomObserver().observe(this, Observer {
+            if (it.gameStarted) {
                 startActivity(intentStartGame)
             }
+        })
+
+        roomViewModel.getPlayerListObserver().observe(this, Observer {
+            startButton.isEnabled = it.size > 1 && PlayersUtils.areAllPlayersReady(it)
         })
 
         startButton.setOnClickListener {
