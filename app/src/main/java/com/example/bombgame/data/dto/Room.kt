@@ -4,10 +4,10 @@ data class Room(
     var gameId: String= "",
     var bombState: String = "",
     var currentBombOwner: String = "",
-    var deltaXCoef: Int = 7,
-    var deltaYCoef: Int = 7,
-    var endOfGame: Int = 0,
-    var timeFromBeginning: Int = 0,
+    var deltaXCoef: Double = 7.0,
+    var deltaYCoef: Double = 7.0,
+    var endOfGame: Double = 0.0,
+    var timeFromBeginning: Double = 0.0,
     var playerList: List<Player> = mutableListOf()
 )
 
