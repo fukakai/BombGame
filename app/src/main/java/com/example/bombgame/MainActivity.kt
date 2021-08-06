@@ -10,8 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.example.bombgame.data.dto.Room
 import com.example.bombgame.game.GameActivity
+import com.example.bombgame.game.dto.Room
 import com.example.bombgame.ui.main.MainViewModel
 import com.example.bombgame.utils.InjectorUtils
 import com.example.bombgame.utils.RoomUtils
@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         val viewModel = ViewModelProvider(this, factory)
             .get(MainViewModel::class.java)
         viewModel.getRoomListObserver().observe(this, Observer {
-            roomList = it
+            roomList = it as List<Room>
         })
 
         idText.filters = arrayOf(InputFilter.AllCaps(), InputFilter.LengthFilter(6))

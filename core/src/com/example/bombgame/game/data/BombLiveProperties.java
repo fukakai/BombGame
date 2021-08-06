@@ -1,5 +1,6 @@
 package com.example.bombgame.game.data;
 
+import com.example.bombgame.game.dto.Player;
 import com.example.bombgame.game.modele.Coordinates;
 import com.example.bombgame.game.modele.PlayerGridModel;
 import java.util.ArrayList;
@@ -11,8 +12,8 @@ public class BombLiveProperties {
 
   private String currentBombOwner;
   private String gameId;
-  private String localPlayer;
-  private ArrayList<String> playerList;
+  private Player localPlayer;
+  private ArrayList<Player> playerList = new ArrayList<>();
   private ArrayList<PlayerGridModel> playersGrid = new ArrayList<>();
   private boolean hasJustBeenTouched;
   private int screenWidth;
@@ -266,11 +267,11 @@ public class BombLiveProperties {
     this.gameId = gameId;
   }
 
-  public String getLocalPlayer() {
+  public Player getLocalPlayer() {
     return localPlayer;
   }
 
-  public void setLocalPlayer(String localPlayer) {
+  public void setLocalPlayer(Player localPlayer) {
     this.localPlayer = localPlayer;
   }
 
@@ -282,11 +283,11 @@ public class BombLiveProperties {
     this.hasJustBeenTouched = hasBeenTouched;
   }
 
-  public ArrayList<String> getPlayerList() {
+  public ArrayList<Player> getPlayerList() {
     return playerList;
   }
 
-  public void setPlayerList(ArrayList<String> playerList) {
+  public void setPlayerList(ArrayList<Player> playerList) {
     this.playerList = playerList;
   }
 

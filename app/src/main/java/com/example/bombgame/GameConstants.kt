@@ -7,4 +7,5 @@ object GameConstants {
     const val DELTA_X_COEF = "deltaXCoef"
     const val DELTA_Y_COEF = "deltaYCoef"
     const val TIME_FROM_BEGINNING = "timeFromBeginning"
+    const val END_OF_GAME = "endOfGame"
 }

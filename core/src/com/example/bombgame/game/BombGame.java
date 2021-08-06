@@ -36,7 +36,6 @@ public class BombGame extends ApplicationAdapter {
     playersDrawer.initDrawPlayers();
 
     randomStart();
-    randomEnd();
   }
 
   @Override
@@ -73,13 +72,5 @@ public class BombGame extends ApplicationAdapter {
 
     bombLiveProperties.setGoToUp(random.nextBoolean());
     bombLiveProperties.setGoToRight(random.nextBoolean());
-  }
-
-  /**
-   * Random time before game over
-   */
-  private void randomEnd() {
-    bombLiveProperties.setEndOfGame(BombConstants.MIN_SECONDS_BEFORE_END + random.nextFloat() * (
-        BombConstants.MAX_SECONDS_BEFORE_END - BombConstants.MIN_SECONDS_BEFORE_END));
   }
 }

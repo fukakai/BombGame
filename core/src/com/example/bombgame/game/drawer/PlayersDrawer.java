@@ -5,7 +5,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.example.bombgame.game.BombConstants;
 import com.example.bombgame.game.data.BombLiveProperties;
+import com.example.bombgame.game.dto.Player;
 import com.example.bombgame.game.enumerate.PlayersPositionEnum;
 import com.example.bombgame.game.modele.PlayerGridModel;
 import java.util.ArrayList;
@@ -21,7 +23,6 @@ public class PlayersDrawer extends ShapeRenderer {
   }
 
   public void playersGridInit() {
-    int thick = 50;
 
     bombLiveProperties.getPlayersGrid()
         .add(PlayersPositionEnum.GAUCHE_HAUT.ordinal(), new PlayerGridModel()
@@ -30,7 +31,7 @@ public class PlayersDrawer extends ShapeRenderer {
         .withRectangle(new Rectangle(
             0,
             bombLiveProperties.getScreenHeight(),
-            thick,
+            BombConstants.PLAYER_THICKNESS,
             -bombLiveProperties.getScreenHeight()*1/3
         )));
 
@@ -41,7 +42,7 @@ public class PlayersDrawer extends ShapeRenderer {
         .withRectangle(new Rectangle(
             0,
             bombLiveProperties.getScreenHeight()*2/3,
-            thick,
+            BombConstants.PLAYER_THICKNESS,
             -bombLiveProperties.getScreenHeight()*1/3
         )));
 
@@ -52,7 +53,7 @@ public class PlayersDrawer extends ShapeRenderer {
         .withRectangle(new Rectangle(
             0,
             bombLiveProperties.getScreenHeight()*1/3,
-            thick,
+            BombConstants.PLAYER_THICKNESS,
             -bombLiveProperties.getScreenHeight()*1/3
         )));
 
@@ -64,7 +65,7 @@ public class PlayersDrawer extends ShapeRenderer {
             0,
             0,
             bombLiveProperties.getScreenWidth()*1/2,
-            thick
+            BombConstants.PLAYER_THICKNESS
         )));
 
     bombLiveProperties.getPlayersGrid()
@@ -75,7 +76,7 @@ public class PlayersDrawer extends ShapeRenderer {
             bombLiveProperties.getScreenWidth()*1/2,
             0,
             bombLiveProperties.getScreenWidth()*1/2,
-            thick
+            BombConstants.PLAYER_THICKNESS
         )));
 
     bombLiveProperties.getPlayersGrid()
@@ -85,7 +86,7 @@ public class PlayersDrawer extends ShapeRenderer {
         .withRectangle(new Rectangle(
             bombLiveProperties.getScreenWidth(),
             0,
-            -thick,
+            -BombConstants.PLAYER_THICKNESS,
             bombLiveProperties.getScreenHeight()*1/3
         )));
 
@@ -96,7 +97,7 @@ public class PlayersDrawer extends ShapeRenderer {
         .withRectangle(new Rectangle(
             bombLiveProperties.getScreenWidth(),
             bombLiveProperties.getScreenHeight()*1/3,
-            -thick,
+            -BombConstants.PLAYER_THICKNESS,
             bombLiveProperties.getScreenHeight()*1/3
         )));
 
@@ -107,7 +108,7 @@ public class PlayersDrawer extends ShapeRenderer {
         .withRectangle(new Rectangle(
             bombLiveProperties.getScreenWidth(),
             bombLiveProperties.getScreenHeight()*2/3,
-            -thick,
+            -BombConstants.PLAYER_THICKNESS,
             bombLiveProperties.getScreenHeight()*1/3
         )));
 
@@ -119,7 +120,7 @@ public class PlayersDrawer extends ShapeRenderer {
             bombLiveProperties.getScreenWidth(),
             bombLiveProperties.getScreenHeight(),
             -bombLiveProperties.getScreenWidth()*1/2,
-            -thick
+            -BombConstants.PLAYER_THICKNESS
             )));
 
     bombLiveProperties.getPlayersGrid()
@@ -130,7 +131,7 @@ public class PlayersDrawer extends ShapeRenderer {
             bombLiveProperties.getScreenWidth()*1/2,
             bombLiveProperties.getScreenHeight(),
             -bombLiveProperties.getScreenWidth(),
-            -thick
+            -BombConstants.PLAYER_THICKNESS
         )));
 
     playersGridUnpicked.addAll(bombLiveProperties.getPlayersGrid());
@@ -138,10 +139,10 @@ public class PlayersDrawer extends ShapeRenderer {
 
   public void refreshPlayers() {
     if (bombLiveProperties.getPlayerList() != null) {
-      for (String playerId : bombLiveProperties.getPlayerList()) {
+      for (Player player : bombLiveProperties.getPlayerList()) {
         for (PlayerGridModel playerGridModel : bombLiveProperties.getPlayersGrid()) {
-          if (playerId.equals(playerGridModel.getPlayerId())) {
-            drawPlayer(playerId, playerGridModel);
+          if (player.getUsername().equals(playerGridModel.getPlayerId())) {
+            drawPlayer(player.getUsername(), playerGridModel);
           }
         }
       }
@@ -150,9 +151,9 @@ public class PlayersDrawer extends ShapeRenderer {
 
   public void initDrawPlayers() {
     if (bombLiveProperties.getPlayerList() != null) {
-      for (String playerId : bombLiveProperties.getPlayerList()) {
-        if(!playerId.equals(bombLiveProperties.getLocalPlayer())) {
-          drawPlayer(playerId, getRandomPlayerGridModel(playerId));
+      for (Player player : bombLiveProperties.getPlayerList()) {
+        if(!player.getUsername().equals(bombLiveProperties.getLocalPlayer())) {
+          drawPlayer(player.getUsername(), getRandomPlayerGridModel(player.getUsername()));
         }
       }
     }

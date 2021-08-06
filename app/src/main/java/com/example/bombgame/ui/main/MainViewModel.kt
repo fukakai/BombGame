@@ -1,7 +1,7 @@
 package com.example.bombgame.ui.main
 
 import androidx.lifecycle.ViewModel
-import com.example.bombgame.data.dto.Room
+import com.example.bombgame.game.dto.Room
 import com.example.bombgame.repository.RoomRepository
 import com.example.bombgame.utils.RoomUtils
 
@@ -46,6 +46,5 @@ class MainViewModel(private val roomRepository: RoomRepository) : ViewModel() {
         while (RoomUtils.isExistingRoom(gameId, roomList)) {
             gameId = RoomUtils.generateId()
         }
-        room.gameId = gameId
     }
 }

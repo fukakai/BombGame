@@ -1,6 +1,6 @@
 package com.example.bombgame.utils
 
-import com.example.bombgame.data.dto.Room
+import com.example.bombgame.game.dto.Room
 
 object RoomUtils {
 
