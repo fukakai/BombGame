@@ -58,6 +58,7 @@ class MainActivity : AppCompatActivity() {
         val findButton = findViewById<Button>(R.id.find_game_button)
         val logInButton = findViewById<Button>(R.id.log_in_button)
         val logOutButton = findViewById<Button>(R.id.log_out_button)
+        val gameButton = findViewById<Button>(R.id.game_button)
         findButton.isEnabled = false
         createButton.isEnabled = false
 
@@ -98,6 +99,11 @@ class MainActivity : AppCompatActivity() {
                 user = it
             }
         })
+
+        gameButton.setOnClickListener {
+            val intent = Intent(this, GameActivity::class.java)
+            startActivity(intent);
+        }
 
         idText.filters =
             arrayOf(InputFilter.AllCaps(), InputFilter.LengthFilter(Constants.MAX_LENGTH_ROOM_ID))

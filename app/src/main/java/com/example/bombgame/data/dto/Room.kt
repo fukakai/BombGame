@@ -1,7 +1,7 @@
 package com.example.bombgame.data.dto
 
 data class Room(
-    var gameId: String= "",
+    var gameId: String = "",
     var bombState: String = "",
     var currentBombOwner: String = "",
     var deltaXCoef: Double = 7.0,
