@@ -61,7 +61,6 @@ class UserRepository private constructor() {
     }
 
     fun listenToUser(id: String) {
-        println("listen $id")
         db.collection(Constants.USERS_COLLECTION)
             .document(id)
             .addSnapshotListener { snapshot, e ->

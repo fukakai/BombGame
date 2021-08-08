@@ -1,15 +1,16 @@
 package com.example.bombgame.repository
 
-import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.bombgame.data.dto.Player
 import com.example.bombgame.data.dto.Room
+import com.example.bombgame.models.Subscription
 import com.example.bombgame.utils.Constants.GAME_STARTED_KEY
-import com.example.bombgame.utils.Constants.PLAYER_LIST_KEY
+import com.example.bombgame.utils.Constants.PLAYER_LIST_COLLECTION
 import com.example.bombgame.utils.Constants.ROOMS_COLLECTION
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
@@ -22,7 +23,9 @@ class RoomRepository private constructor() {
     private val roomListLiveData = MutableLiveData<List<Room>>()
     private val currentRoomLiveData = MutableLiveData<Room>()
     private val playerListLiveData = MutableLiveData<List<Player>>()
-    private val gameStartedLiveData = MutableLiveData<Boolean>()
+
+    private lateinit var roomSubscription: ListenerRegistration
+    private lateinit var playerListSubscription: ListenerRegistration
 
     init {
         listenToRoomList()
@@ -31,7 +34,6 @@ class RoomRepository private constructor() {
     fun getRoomListObserver() = roomListLiveData as LiveData<List<Room>>
     fun getCurrentRoomObserver() = currentRoomLiveData as LiveData<Room>
     fun getPlayerListObserver() = playerListLiveData as LiveData<List<Player>>
-    fun getGameStartedObserver() = gameStartedLiveData as LiveData<Boolean>
 
     companion object {
         @Volatile
@@ -47,14 +49,26 @@ class RoomRepository private constructor() {
      * Add a room to the firestore database.
      * @param room The room to add
      */
-    fun addRoom(room: Room) {
+    fun addRoom(room: Room, player: Player) {
         db.collection(ROOMS_COLLECTION)
             .document(room.gameId)
             .set(room)
-            .addOnSuccessListener { Log.d(TAG, "Room added with ID ${room.gameId}") }
+            .addOnSuccessListener {
+                Log.d(TAG, "Room added with ID ${room.gameId}")
+                addPlayerCollection(room.gameId, player)
+            }
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error adding room", e)
             }
+    }
+
+    private fun addPlayerCollection(gameId: String, player: Player) {
+        db.collection(ROOMS_COLLECTION)
+            .document(gameId)
+            .collection(PLAYER_LIST_COLLECTION)
+            .document(player.username)
+            .set(player)
+
     }
 
     /**
@@ -77,15 +91,17 @@ class RoomRepository private constructor() {
      * Add a player to a room with the firestore database.
      * @param room The player to add
      */
-    fun updatePlayersList(gameId: String, playersList: List<Player>) {
+    fun updatePlayer(gameId: String, player: Player) {
         db.collection(ROOMS_COLLECTION)
             .document(gameId)
-            .update(PLAYER_LIST_KEY, playersList)
+            .collection(PLAYER_LIST_COLLECTION)
+            .document(player.username)
+            .set(player)
             .addOnSuccessListener {
-                Log.d(TAG, "Player added")
+                Log.d(TAG, "Player ${player.username} added.")
             }
             .addOnFailureListener { e ->
-                Log.w(TAG, "Error adding player", e)
+                Log.w(TAG, "Error adding player ${player.username}.", e)
             }
     }
 
@@ -107,37 +123,22 @@ class RoomRepository private constructor() {
     }
 
     /**
-     * Return a list containing every rooms in the firestore database.
-     * @return A List of all the rooms.
-     */
-    suspend fun getAllRooms(): List<Room> {
-        return try {
-            db.collection(ROOMS_COLLECTION)
-                .get()
-                .await()
-                .documents
-                .mapNotNull { it.toObject<Room>() }
-        } catch (e: Exception) {
-            Log.w(TAG, "Error getting room list.", e)
-            emptyList()
-        }
-    }
-
-    /**
      * Return a room from the firestore database.
      * @param id the id of the room you want to get
      * @return A room.
      */
-    suspend fun getRoom(id: String): Room? {
+    suspend fun isUsernameTaken(id: String, username: String): Boolean {
         return try {
-            (db.collection(ROOMS_COLLECTION)
+            (!db.collection(ROOMS_COLLECTION)
                 .document(id)
+                .collection(PLAYER_LIST_COLLECTION)
+                .whereEqualTo("username", username)
                 .get()
                 .await()
-                .toObject())
+                .isEmpty)
         } catch (e: Exception) {
-            Log.w(TAG, "Error getting room.", e)
-            null
+            Log.w(TAG, "Error getting player list of room $id.", e)
+            false
         }
     }
 
@@ -151,7 +152,6 @@ class RoomRepository private constructor() {
                     Log.w(TAG, "Could not listen to rooms collection.", e)
                     return@addSnapshotListener
                 }
-
                 roomListLiveData.value = if (snapshot != null && !snapshot.isEmpty) {
                     snapshot.documents.mapNotNull { it.toObject<Room>() }
                 } else {
@@ -165,49 +165,16 @@ class RoomRepository private constructor() {
      * @param id The id of the room to delete.
      */
     fun deletePlayerFromRoom(playerUsername: String, roomId: String) {
-        val updatedList = playerListLiveData.value?.filter { it.username != playerUsername }
-
         db.collection(ROOMS_COLLECTION)
             .document(roomId)
-            .update(PLAYER_LIST_KEY, updatedList)
+            .collection(PLAYER_LIST_COLLECTION)
+            .document(playerUsername)
+            .delete()
             .addOnSuccessListener {
-                Log.d(ContentValues.TAG, "Player $playerUsername successfully deleted.")
+                Log.d(TAG, "Player $playerUsername successfully deleted.")
             }
             .addOnFailureListener { e ->
-                Log.w(ContentValues.TAG, "Error deleting player $playerUsername", e)
-            }
-    }
-
-    /**
-     * Listen to the firestore database for players and update the playerList every time it changes.
-     */
-    fun listenToPlayerList(gameId: String) {
-        db.collection(ROOMS_COLLECTION)
-            .document(gameId)
-            .addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    Log.w(TAG, "Could not listen to players collection.", e)
-                    return@addSnapshotListener
-                }
-
-                val playersList = snapshot?.toObject<Room>()?.playerList
-                playerListLiveData.value = if (!playersList.isNullOrEmpty()) {
-                    playersList
-                } else {
-                    emptyList()
-                }
-            }
-    }
-
-    fun listenToGameStarted(gameId: String) {
-        db.collection(ROOMS_COLLECTION)
-            .document(gameId)
-            .addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    Log.w(TAG, "Could not listen to room $gameId.", e)
-                    return@addSnapshotListener
-                }
-                gameStartedLiveData.value = snapshot?.toObject<Room>()?.gameStarted
+                Log.w(TAG, "Error deleting player $playerUsername", e)
             }
     }
 
@@ -215,5 +182,41 @@ class RoomRepository private constructor() {
         db.collection(ROOMS_COLLECTION)
             .document(gameId)
             .update(GAME_STARTED_KEY, value)
+    }
+
+    fun listenToRoom(gameId: String) {
+        roomSubscription = db.collection(ROOMS_COLLECTION)
+            .document(gameId)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.w(TAG, "Could not listen to room $gameId.", e)
+                    return@addSnapshotListener
+                }
+                currentRoomLiveData.value = snapshot?.toObject<Room>()
+            }
+    }
+
+    fun listenToPlayerList(gameId: String) {
+        playerListSubscription = db.collection(ROOMS_COLLECTION)
+            .document(gameId)
+            .collection(PLAYER_LIST_COLLECTION)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.w(TAG, "Could not listen to room $gameId.", e)
+                    return@addSnapshotListener
+                }
+                playerListLiveData.value = if (snapshot != null && !snapshot.isEmpty) {
+                    snapshot.documents.mapNotNull { it.toObject<Player>() }
+                } else {
+                    emptyList()
+                }
+            }
+    }
+
+    fun unsubscribe(subscription: Subscription) {
+        when (subscription) {
+            Subscription.ROOMS -> roomSubscription.remove()
+            Subscription.PLAYER_LIST -> roomSubscription.remove()
+        }
     }
 }

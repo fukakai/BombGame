@@ -8,6 +8,5 @@ data class Room(
     var deltaYCoef: Double = 7.0,
     var endOfGame: Double = 0.0,
     var timeFromBeginning: Double = 0.0,
-    var playerList: List<Player> = mutableListOf(),
     var gameStarted: Boolean = false
 )
