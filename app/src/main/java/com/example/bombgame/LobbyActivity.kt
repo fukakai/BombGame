@@ -33,13 +33,13 @@ class LobbyActivity : AppCompatActivity() {
         val intentLobbyActivity = intent
         val bundle = intentLobbyActivity.extras
 
+        var gameAlreadyStarted = false
         val gridView = findViewById<GridView>(R.id.players_list)
         val pseudo = findViewById<EditText>(R.id.pseudo_text)
         val readyButton = findViewById<Button>(R.id.ready_button)
         val leaveButton = findViewById<Button>(R.id.leave_button)
         val startButton = findViewById<Button>(R.id.start_button)
         val roomIdText = findViewById<TextView>(R.id.room_id)
-        val intentStartGame = Intent(this, GameActivity::class.java)
 
         if (bundle?.getString(ROOM_ID_KEY) != null) {
             roomId = bundle.getString(ROOM_ID_KEY)!!
@@ -60,8 +60,9 @@ class LobbyActivity : AppCompatActivity() {
             .get(RoomViewModel::class.java)
 
         roomViewModel.getCurrentRoomObserver().observe(this, Observer {
-            if (it.gameStarted) {
-                startActivity(intentStartGame)
+            if (it.gameStarted && !gameAlreadyStarted) {
+                gameAlreadyStarted = true
+                startGameActivity(playerUsername, roomId)
             }
         })
 
@@ -117,4 +118,12 @@ class LobbyActivity : AppCompatActivity() {
         super.onDestroy()
         roomViewModel.deletePlayer(playerUsername, roomId)
     }
+
+    private fun startGameActivity(playerId: String, gameId: String) {
+        val intent = Intent(this, GameActivity::class.java)
+        intent.putExtra(PLAYER_USERNAME_KEY, playerId)
+        intent.putExtra(ROOM_ID_KEY, gameId)
+        startActivity(intent)
+    }
+
 }

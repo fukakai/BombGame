@@ -26,6 +26,7 @@ class RoomRepository private constructor() {
 
     private lateinit var roomSubscription: ListenerRegistration
     private lateinit var playerListSubscription: ListenerRegistration
+    private lateinit var roomListSubscription: ListenerRegistration
 
     init {
         listenToRoomList()
@@ -146,7 +147,7 @@ class RoomRepository private constructor() {
      * Listen to the firestore database and update the roomList every time it changes.
      */
     private fun listenToRoomList() {
-        db.collection(ROOMS_COLLECTION)
+        roomListSubscription = db.collection(ROOMS_COLLECTION)
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
                     Log.w(TAG, "Could not listen to rooms collection.", e)
@@ -215,8 +216,9 @@ class RoomRepository private constructor() {
 
     fun unsubscribe(subscription: Subscription) {
         when (subscription) {
-            Subscription.ROOMS -> roomSubscription.remove()
+            Subscription.ROOM_LIST -> roomListSubscription.remove()
             Subscription.PLAYER_LIST -> roomSubscription.remove()
+            Subscription.ROOM -> roomSubscription.remove()
         }
     }
 }

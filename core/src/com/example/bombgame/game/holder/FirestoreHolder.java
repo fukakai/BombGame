@@ -13,8 +13,9 @@ public class FirestoreHolder {
   }
 
   public interface AndroidFirestoreInterface {
-    void updateCurrentBombOwner(String string);
+    void updateCurrentBombOwner(String username);
     void updateBombSpeed();
     void updateTimeFromBeginning();
+    void setEndOfGame(int end);
   }
 }

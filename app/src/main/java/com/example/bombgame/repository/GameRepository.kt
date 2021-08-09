@@ -1,19 +1,24 @@
 package com.example.bombgame.repository
 
 import com.example.bombgame.GameConstants
+import com.example.bombgame.data.dto.Player
 import com.example.bombgame.game.BombConstants
 import com.example.bombgame.game.data.BombLiveProperties
 import com.example.bombgame.game.holder.FirestoreHolder
+import com.example.bombgame.utils.Constants.PLAYER_LIST_COLLECTION
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import java.util.*
 
 class GameRepository : FirestoreHolder.AndroidFirestoreInterface {
     private val db = Firebase.firestore
+    private val properties = BombLiveProperties.getInstance()
 
-    override fun updateCurrentBombOwner(string: String?) {
+    override fun updateCurrentBombOwner(username: String?) {
         db.collection(GameConstants.ROOMS)
             .document(BombLiveProperties.getInstance().gameId)
-            .update(GameConstants.BOMB_OWNER, string)
+            .update(GameConstants.BOMB_OWNER, username)
     }
 
     override fun updateBombSpeed() {
@@ -46,13 +51,23 @@ class GameRepository : FirestoreHolder.AndroidFirestoreInterface {
     fun reinitialiseTimeFromBeginning() {
         db.collection(GameConstants.ROOMS)
             .document(BombLiveProperties.getInstance().gameId)
-            .update(GameConstants.TIME_FROM_BEGINNING,0F)
+            .update(GameConstants.TIME_FROM_BEGINNING, 0F)
     }
 
-    fun updatePlayerList(playerList: ArrayList<String>?) {
+    override fun setEndOfGame(end: Int) {
         db.collection(GameConstants.ROOMS)
             .document(BombLiveProperties.getInstance().gameId)
-            .update(GameConstants.PLAYER_LIST, playerList)
+            .update(GameConstants.END_OF_GAME, end)
+    }
+
+    fun updatePlayerList(playerList: List<Player>) {
+        for (player in playerList) {
+            db.collection(GameConstants.ROOMS)
+                .document(BombLiveProperties.getInstance().gameId)
+                .collection(PLAYER_LIST_COLLECTION)
+                .document(player.username)
+                .set(player)
+        }
     }
 
     fun listenToUpdates() {
@@ -63,82 +78,82 @@ class GameRepository : FirestoreHolder.AndroidFirestoreInterface {
     }
 
     private fun listenToCurrentBombOwner() {
-        val docRef =
-            db.collection(GameConstants.ROOMS)
-                .document(BombLiveProperties.getInstance().gameId)
-        docRef.addSnapshotListener { snapshot, e ->
-            if (snapshot != null && snapshot.exists()) {
-                BombLiveProperties.getInstance()
-                    .setCurrentBombOwner(snapshot.data?.get(GameConstants.BOMB_OWNER).toString());
+        db.collection(GameConstants.ROOMS)
+            .document(BombLiveProperties.getInstance().gameId)
+            .addSnapshotListener { snapshot, e ->
+                if (snapshot != null && snapshot.exists()) {
+                    BombLiveProperties.getInstance().currentBombOwner =
+                        snapshot.data?.get(GameConstants.BOMB_OWNER).toString();
+                }
             }
-        }
     }
 
     private fun listenToTimeFromBeginning() {
-        val docRef =
-            db.collection(GameConstants.ROOMS)
-                .document(BombLiveProperties.getInstance().gameId)
-        docRef.addSnapshotListener { snapshot, e ->
-            if (snapshot != null && snapshot.exists()) {
-                var timeFromBeginning: Float? = null;
 
-                if (snapshot.data?.get(GameConstants.TIME_FROM_BEGINNING) is Long) {
-                    timeFromBeginning =
-                        (snapshot.data?.get(GameConstants.TIME_FROM_BEGINNING) as Long).toFloat()
-                }
+        db.collection(GameConstants.ROOMS)
+            .document(BombLiveProperties.getInstance().gameId)
+            .addSnapshotListener { snapshot, e ->
+                if (snapshot != null && snapshot.exists()) {
+                    var timeFromBeginning: Float? = null;
 
-                if (snapshot.data?.get(GameConstants.TIME_FROM_BEGINNING) is Double) {
-                    timeFromBeginning =
-                        (snapshot.data?.get(GameConstants.TIME_FROM_BEGINNING) as Double).toFloat()
-                }
+                    if (snapshot.data?.get(GameConstants.TIME_FROM_BEGINNING) is Long) {
+                        timeFromBeginning =
+                            (snapshot.data?.get(GameConstants.TIME_FROM_BEGINNING) as Long).toFloat()
+                    }
 
-                if (timeFromBeginning != null) {
-                    BombLiveProperties.getInstance().timeFromBeginning = timeFromBeginning
+                    if (snapshot.data?.get(GameConstants.TIME_FROM_BEGINNING) is Double) {
+                        timeFromBeginning =
+                            (snapshot.data?.get(GameConstants.TIME_FROM_BEGINNING) as Double).toFloat()
+                    }
+
+                    if (timeFromBeginning != null) {
+                        BombLiveProperties.getInstance().timeFromBeginning = timeFromBeginning
+                    }
                 }
             }
-        }
     }
 
     private fun listenToPlayerList() {
-        val docRef =
-            db.collection(GameConstants.ROOMS)
-                .document(BombLiveProperties.getInstance().gameId)
-        docRef.addSnapshotListener { snapshot, e ->
-            if (snapshot != null && snapshot.exists()) {
-                BombLiveProperties.getInstance()
-                    .setPlayerList(snapshot.data?.get(GameConstants.PLAYER_LIST) as ArrayList<String>)
+        db.collection(GameConstants.ROOMS)
+            .document(BombLiveProperties.getInstance().gameId)
+            .collection(PLAYER_LIST_COLLECTION)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    return@addSnapshotListener
+                }
+                BombLiveProperties.getInstance().playerList = if (snapshot != null && !snapshot.isEmpty) {
+                    snapshot.documents.mapNotNull { it.toObject<Player>()?.username } as ArrayList<String>?
+                } else null
             }
-        }
     }
 
     private fun listenToDelta() {
-        val docRef =
-            db.collection(GameConstants.ROOMS)
-                .document(BombLiveProperties.getInstance().gameId)
-        docRef.addSnapshotListener { snapshot, e ->
-            if (snapshot != null && snapshot.exists()) {
-                var deltaXCoef: Float? = null;
-                var deltaYCoef: Float? = null;
+        db.collection(GameConstants.ROOMS)
+            .document(BombLiveProperties.getInstance().gameId)
+            .addSnapshotListener { snapshot, e ->
+                if (snapshot != null && snapshot.exists()) {
+                    var deltaXCoef: Float? = null;
+                    var deltaYCoef: Float? = null;
 
-                if (snapshot.data?.get(GameConstants.DELTA_X_COEF) is Long) {
-                    deltaXCoef =
-                        (snapshot.data?.get(GameConstants.DELTA_X_COEF) as Long).toFloat()
-                    deltaYCoef =
-                        (snapshot.data?.get(GameConstants.DELTA_Y_COEF) as Long).toFloat()
-                }
+                    if (snapshot.data?.get(GameConstants.DELTA_X_COEF) is Long) {
+                        deltaXCoef =
+                            (snapshot.data?.get(GameConstants.DELTA_X_COEF) as Long).toFloat()
+                        deltaYCoef =
+                            (snapshot.data?.get(GameConstants.DELTA_Y_COEF) as Long).toFloat()
+                    }
 
-                if (snapshot.data?.get(GameConstants.DELTA_X_COEF) is Double) {
-                    deltaXCoef =
-                        (snapshot.data?.get(GameConstants.DELTA_X_COEF) as Double).toFloat()
-                    deltaYCoef =
-                        (snapshot.data?.get(GameConstants.DELTA_Y_COEF) as Double).toFloat()
-                }
+                    if (snapshot.data?.get(GameConstants.DELTA_X_COEF) is Double) {
+                        deltaXCoef =
+                            (snapshot.data?.get(GameConstants.DELTA_X_COEF) as Double).toFloat()
+                        deltaYCoef =
+                            (snapshot.data?.get(GameConstants.DELTA_Y_COEF) as Double).toFloat()
+                    }
 
-                if (deltaXCoef != null && deltaYCoef != null) {
-                    BombLiveProperties.getInstance().deltaXCoef = deltaXCoef
-                    BombLiveProperties.getInstance().deltaYCoef = deltaYCoef
+                    if (deltaXCoef != null && deltaYCoef != null) {
+                        BombLiveProperties.getInstance().deltaXCoef = deltaXCoef
+                        BombLiveProperties.getInstance().deltaYCoef = deltaYCoef
+                    }
                 }
             }
-        }
     }
 }
