@@ -91,6 +91,7 @@ public class BombPhysics {
               playerGridModel)
               || isBombInCollisionWithAplayer(bombLiveProperties.getMiddleLeft(),
               playerGridModel)) {
+            bombLiveProperties.setHasJustBeenTouched(false);
             bombService.updateBombDatas(playerGridModel.getPlayerId());
             return true;
           }
