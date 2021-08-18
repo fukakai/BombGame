@@ -1,8 +1,6 @@
 package com.example.bombgame.game.service;
 
-import com.example.bombgame.game.data.BombLiveProperties;
 import com.example.bombgame.game.holder.FirestoreHolder;
-import java.util.Random;
 
 public class BombService {
 
@@ -20,5 +18,13 @@ public class BombService {
     FirestoreHolder.getFirestoreDatabase().updateCurrentBombOwner(player);
     FirestoreHolder.getFirestoreDatabase().updateBombSpeed();
     FirestoreHolder.getFirestoreDatabase().updateTimeFromBeginning();
+  }
+
+  public void updateCurrentBombOwner(String bombOwner) {
+    FirestoreHolder.getFirestoreDatabase().updateCurrentBombOwner(bombOwner);
+  }
+
+  public void setEndOfGame(int end) {
+    FirestoreHolder.getFirestoreDatabase().setEndOfGame(end);
   }
 }

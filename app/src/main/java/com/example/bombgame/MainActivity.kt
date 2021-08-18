@@ -15,7 +15,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.bombgame.data.dto.Room
 import com.example.bombgame.data.dto.User
-import com.example.bombgame.game.GameActivity
 import com.example.bombgame.models.Subscription
 import com.example.bombgame.ui.main.RoomViewModel
 import com.example.bombgame.ui.main.RoomViewModelFactory
@@ -209,7 +208,7 @@ class MainActivity : AppCompatActivity() {
         intent.putExtra(ROOM_ID_KEY, roomId)
         roomViewModel.listenToRoom(roomId)
         roomViewModel.listenToPlayerList(roomId)
-        roomViewModel.unsubscribe(Subscription.ROOMS)
+        roomViewModel.unsubscribe(Subscription.ROOM_LIST)
         startActivity(intent)
     }
 

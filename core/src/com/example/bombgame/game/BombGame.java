@@ -10,6 +10,7 @@ import com.example.bombgame.game.drawer.PlayersDrawer;
 import com.example.bombgame.game.physics.BombPhysics;
 import com.example.bombgame.game.rules.GameRules;
 import com.example.bombgame.game.service.BombService;
+
 import java.util.Random;
 
 public class BombGame extends ApplicationAdapter {
@@ -42,8 +43,23 @@ public class BombGame extends ApplicationAdapter {
   @Override
   public void render() {
     ScreenUtils.clear(Color.WHITE);
-    //TODO: NullPointerException can happen here
-    if(bombLiveProperties.getCurrentBombOwner().equals(bombLiveProperties.getLocalPlayer())) {
+    // TODO: No NPE anymore but code is UGLY
+
+    // Update le currentBombOwner pour le début de partie.
+    if (bombLiveProperties.getCurrentBombOwner() != null
+        && bombLiveProperties.getCurrentBombOwner().equals("")
+        && bombLiveProperties.getPlayerList() != null) {
+      String randomPlayer =
+          bombLiveProperties
+              .getPlayerList()
+              .get(random.nextInt(bombLiveProperties.getPlayerList().size()));
+      bombLiveProperties.setCurrentBombOwner(randomPlayer);
+      bombService.updateCurrentBombOwner(bombLiveProperties.getCurrentBombOwner());
+    }
+
+    if ((bombLiveProperties.getCurrentBombOwner() != null
+            && bombLiveProperties.getLocalPlayer() != null)
+        && (bombLiveProperties.getCurrentBombOwner().equals(bombLiveProperties.getLocalPlayer()))) {
       bombDrawer.drawBomb();
       if (!bombLiveProperties.isGameOver()) {
         bombPhysics.animate();
@@ -60,12 +76,10 @@ public class BombGame extends ApplicationAdapter {
     bombDrawer.dispose();
     bombDrawer.getBombNormalTexture().dispose();
     bombDrawer.getBombExplosionTexture().dispose();
-    bombLiveProperties.reset();
+    BombLiveProperties.getInstance().reset();
   }
 
-  /**
-   * Give random directions to start
-   */
+  /** Give random directions to start */
   private void randomStart() {
     bombLiveProperties.setBombX(
         bombLiveProperties.getScreenWidth() / 2 - bombLiveProperties.getBombWidth() / 2);
@@ -76,11 +90,11 @@ public class BombGame extends ApplicationAdapter {
     bombLiveProperties.setGoToRight(random.nextBoolean());
   }
 
-  /**
-   * Random time before game over
-   */
+  /** Random time before game over */
   private void randomEnd() {
-    bombLiveProperties.setEndOfGame(BombConstants.MIN_SECONDS_BEFORE_END + random.nextFloat() * (
-        BombConstants.MAX_SECONDS_BEFORE_END - BombConstants.MIN_SECONDS_BEFORE_END));
+    bombLiveProperties.setEndOfGame(
+        BombConstants.MIN_SECONDS_BEFORE_END
+            + random.nextFloat()
+                * (BombConstants.MAX_SECONDS_BEFORE_END - BombConstants.MIN_SECONDS_BEFORE_END));
   }
 }
