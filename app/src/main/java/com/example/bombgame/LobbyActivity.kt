@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.example.bombgame.models.Subscription
 import com.example.bombgame.ui.main.RoomViewModel
 import com.example.bombgame.utils.Constants.PLAYER_USERNAME_KEY
 import com.example.bombgame.utils.Constants.ROOM_ID_KEY
@@ -117,6 +118,8 @@ class LobbyActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         roomViewModel.deletePlayer(playerUsername, roomId)
+        roomViewModel.listenToRoomList()
+        roomViewModel.unsubscribe(listOf(Subscription.PLAYER_LIST, Subscription.ROOM))
     }
 
     private fun startGameActivity(playerId: String, gameId: String) {
