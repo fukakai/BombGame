@@ -91,6 +91,7 @@ public class BombPhysics {
               playerGridModel)
               || isBombInCollisionWithAplayer(bombLiveProperties.getMiddleLeft(),
               playerGridModel)) {
+            bombLiveProperties.setHasJustBeenTouched(false);
             bombService.updateBombDatas(playerGridModel.getPlayerId());
             return true;
           }
@@ -222,11 +223,12 @@ public class BombPhysics {
             bombLiveProperties.getTouchedX() - bombLiveProperties.getBombWidth() / 2);
         bombLiveProperties.setBombY(
             bombLiveProperties.getTouchedY() - bombLiveProperties.getBombHeight() / 2);
-        bombLiveProperties.setHasJustBeenTouched(true);
       }
+    } else if (bombLiveProperties.isBombTouched()) {
+      bombLiveProperties.setHasJustBeenTouched(true);
+      bombLiveProperties.setBombTouched(false);
     }
     deltaVelocity();
-    bombLiveProperties.setBombTouched(false);
   }
 
   /**

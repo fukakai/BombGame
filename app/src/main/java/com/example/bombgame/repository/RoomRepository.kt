@@ -146,7 +146,7 @@ class RoomRepository private constructor() {
     /**
      * Listen to the firestore database and update the roomList every time it changes.
      */
-    private fun listenToRoomList() {
+    fun listenToRoomList() {
         roomListSubscription = db.collection(ROOMS_COLLECTION)
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
@@ -215,6 +215,7 @@ class RoomRepository private constructor() {
     }
 
     fun unsubscribe(subscription: Subscription) {
+        println("UNSUB FROM $subscription")
         when (subscription) {
             Subscription.ROOM_LIST -> roomListSubscription.remove()
             Subscription.PLAYER_LIST -> roomSubscription.remove()

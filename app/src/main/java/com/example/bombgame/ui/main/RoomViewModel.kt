@@ -114,5 +114,9 @@ class RoomViewModel(private val roomRepository: RoomRepository) : ViewModel() {
     fun unsubscribe(subscription: Subscription) {
         roomRepository.unsubscribe(subscription)
     }
+
+    fun listenToRoomList() {
+        roomRepository.listenToRoomList()
+    }
 }
 

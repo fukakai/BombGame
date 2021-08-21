@@ -52,6 +52,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
+        println("TRIGGER CREATE MAIN")
         mainHandler = Handler(Looper.getMainLooper())
 
         val createButton = findViewById<Button>(R.id.create_room_button)
