@@ -90,11 +90,18 @@ class RoomViewModel(private val roomRepository: RoomRepository) : ViewModel() {
     }
 
     fun switchReady(gameId: String, playerUsername: String) {
-        val playerList = playerListLiveData.value
-        if (playerList != null) {
-            val player = playerList.find { it.username == playerUsername }!!
+        val player = getLocalPlayer(playerUsername)
+        if (player != null) {
             player.ready = !player.ready
             roomRepository.updatePlayer(gameId, player)
+        }
+    }
+
+    fun updatePlayerUsername(gameId: String, currentUsername: String, newUsername: String) {
+        val player = getLocalPlayer(currentUsername)
+        if (player != null) {
+            player.username = newUsername
+            roomRepository.updatePlayerUsername(gameId, currentUsername, player)
         }
     }
 
@@ -146,6 +153,10 @@ class RoomViewModel(private val roomRepository: RoomRepository) : ViewModel() {
      */
     fun unsubscribe(subscription: Subscription) {
         roomRepository.unsubscribe(subscription)
+    }
+
+    private fun getLocalPlayer(username: String): Player? {
+        return playerListLiveData.value?.find { it.username == username }
     }
 }
 

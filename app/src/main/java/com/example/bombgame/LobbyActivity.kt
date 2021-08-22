@@ -9,8 +9,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.bombgame.data.dto.Player
+import com.example.bombgame.data.dto.User
 import com.example.bombgame.models.Subscription
 import com.example.bombgame.ui.main.RoomViewModel
+import com.example.bombgame.ui.main.UserViewModel
 import com.example.bombgame.ui.main.adapter.LobbyAdapter
 import com.example.bombgame.utils.Constants.GREEN
 import com.example.bombgame.utils.Constants.PLAYER_USERNAME_KEY
@@ -18,6 +20,7 @@ import com.example.bombgame.utils.Constants.READY_FALSE
 import com.example.bombgame.utils.Constants.READY_TRUE
 import com.example.bombgame.utils.Constants.RED
 import com.example.bombgame.utils.Constants.ROOM_ID_KEY
+import com.example.bombgame.utils.Constants.USER
 import com.example.bombgame.utils.InjectorUtils
 import com.example.bombgame.utils.PlayersUtils
 import kotlinx.android.synthetic.main.activity_lobby.*
@@ -27,7 +30,9 @@ class LobbyActivity : AppCompatActivity() {
 
     private lateinit var playerUsername: String
     private lateinit var roomId: String
+    private lateinit var user: User
     private lateinit var roomViewModel: RoomViewModel
+    private lateinit var userViewModel: UserViewModel
     private var playerList: List<Player> = mutableListOf()
     private var ready = false
     private var gameAlreadyStarted = false
@@ -44,7 +49,8 @@ class LobbyActivity : AppCompatActivity() {
         initializeButtons()
         initializeRoomViewModel()
 
-        room_id.text = roomId
+        val roomText = "GAME ID : $roomId"
+        room_id.text = roomText
     }
 
     override fun onDestroy() {
@@ -82,6 +88,15 @@ class LobbyActivity : AppCompatActivity() {
         leave_button.setOnClickListener {
             finish()
         }
+
+        ok_button_lobby.setOnClickListener {
+            val newUsername = username_text_lobby.text.toString()
+            if (user.id != "") {
+                userViewModel.updateUser(user, newUsername)
+            }
+            roomViewModel.updatePlayerUsername(roomId, playerUsername, newUsername)
+            playerUsername = newUsername
+        }
     }
 
     /**
@@ -98,6 +113,10 @@ class LobbyActivity : AppCompatActivity() {
         if (bundle?.getString(PLAYER_USERNAME_KEY) != null) {
             playerUsername = bundle.getString(PLAYER_USERNAME_KEY)!!
         }
+
+        if (bundle?.getSerializable(USER) != null) {
+            user = (bundle.getSerializable(USER) as User)
+        }
     }
 
     /**
@@ -107,6 +126,9 @@ class LobbyActivity : AppCompatActivity() {
         val roomFactory = InjectorUtils.provideRoomViewModelFactory()
         roomViewModel = ViewModelProvider(this, roomFactory)
             .get(RoomViewModel::class.java)
+        val userFactory = InjectorUtils.provideUserViewModelFactory()
+        userViewModel = ViewModelProvider(this, userFactory)
+            .get(UserViewModel::class.java)
 
         roomViewModel.getCurrentRoomObserver().observe(this, Observer {
 

@@ -1,6 +1,7 @@
 package com.example.bombgame.ui.main.adapter
 
 import android.graphics.Color
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,6 +33,19 @@ class LobbyAdapter(private var playerList: List<Player>): RecyclerView.Adapter<L
             holder.readyText.setTextColor(Color.parseColor(GREEN))
         } else {
             holder.readyText.setTextColor(Color.parseColor(RED))
+        }
+
+        // TODO: automate this with autoSizeText but doesn't seem to work
+        when {
+            currentPlayer.username.length <= 7 -> {
+                holder.usernameText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30f)
+            }
+            currentPlayer.username.length in 8..10 -> {
+                holder.usernameText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f)
+            }
+            currentPlayer.username.length > 10 -> {
+                holder.usernameText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f)
+            }
         }
     }
 

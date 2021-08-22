@@ -15,13 +15,12 @@ import com.example.bombgame.data.dto.Room
 import com.example.bombgame.data.dto.User
 import com.example.bombgame.models.Subscription
 import com.example.bombgame.ui.main.RoomViewModel
-import com.example.bombgame.ui.main.RoomViewModelFactory
 import com.example.bombgame.ui.main.UserViewModel
-import com.example.bombgame.ui.main.UserViewModelFactory
 import com.example.bombgame.utils.Constants
 import com.example.bombgame.utils.Constants.PLAYER_USERNAME_KEY
 import com.example.bombgame.utils.Constants.RC_SIGN_IN
 import com.example.bombgame.utils.Constants.ROOM_ID_KEY
+import com.example.bombgame.utils.Constants.USER
 import com.example.bombgame.utils.InjectorUtils
 import com.example.bombgame.utils.RoomUtils
 import com.firebase.ui.auth.AuthUI
@@ -45,9 +44,7 @@ class MainActivity : AppCompatActivity() {
         AuthUI.IdpConfig.FacebookBuilder().build()
     )
 
-    private lateinit var roomFactory: RoomViewModelFactory
     private lateinit var roomViewModel: RoomViewModel
-    private lateinit var userFactory: UserViewModelFactory
     private lateinit var userViewModel: UserViewModel
     private lateinit var mainHandler: Handler
 
@@ -97,6 +94,7 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, LobbyActivity::class.java)
         intent.putExtra(PLAYER_USERNAME_KEY, playerId)
         intent.putExtra(ROOM_ID_KEY, roomId)
+        intent.putExtra(USER, user)
         roomViewModel.listenToRoom(roomId)
         roomViewModel.listenToPlayerList(roomId)
         roomViewModel.unsubscribe(Subscription.ROOM_LIST)
@@ -190,7 +188,7 @@ class MainActivity : AppCompatActivity() {
      * Initialize the viewModels for the main activity.
      */
     private fun initializeViewModels() {
-        roomFactory = InjectorUtils.provideRoomViewModelFactory()
+        val roomFactory = InjectorUtils.provideRoomViewModelFactory()
         roomViewModel = ViewModelProvider(this, roomFactory)
             .get(RoomViewModel::class.java)
         roomViewModel.getRoomListObserver().observe(this, Observer {
@@ -201,7 +199,7 @@ class MainActivity : AppCompatActivity() {
             currentRoom = it
         })
 
-        userFactory = InjectorUtils.provideUserViewModelFactory()
+        val userFactory = InjectorUtils.provideUserViewModelFactory()
         userViewModel = ViewModelProvider(this, userFactory)
             .get(UserViewModel::class.java)
         userViewModel.getUserObserver().observe(this, Observer {
