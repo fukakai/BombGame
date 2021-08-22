@@ -15,12 +15,19 @@ class GameRepository : FirestoreHolder.AndroidFirestoreInterface {
     private val db = Firebase.firestore
     private val properties = BombLiveProperties.getInstance()
 
+    /**
+     * Update the current bomb owner to firestore.
+     * @param username : The current bomb owner's username.
+     */
     override fun updateCurrentBombOwner(username: String?) {
         db.collection(GameConstants.ROOMS)
             .document(BombLiveProperties.getInstance().gameId)
             .update(GameConstants.BOMB_OWNER, username)
     }
 
+    /**
+     * Update the current bomb speed to firestore.
+     */
     override fun updateBombSpeed() {
         db.collection(GameConstants.ROOMS)
             .document(BombLiveProperties.getInstance().gameId)
@@ -30,6 +37,9 @@ class GameRepository : FirestoreHolder.AndroidFirestoreInterface {
             .update(GameConstants.DELTA_Y_COEF, BombLiveProperties.getInstance().deltaYCoef)
     }
 
+    /**
+     * Reinitialize bomb's deltas to default values to firestore.
+     */
     fun reinitialiseDeltasToDefault() {
         db.collection(GameConstants.ROOMS)
             .document(BombLiveProperties.getInstance().gameId)
@@ -39,6 +49,9 @@ class GameRepository : FirestoreHolder.AndroidFirestoreInterface {
             .update(GameConstants.DELTA_Y_COEF, BombConstants.INITIAL_BOMB_SPEED)
     }
 
+    /**
+     * Update timer from beginning of the game to firestore.
+     */
     override fun updateTimeFromBeginning() {
         db.collection(GameConstants.ROOMS)
             .document(BombLiveProperties.getInstance().gameId)
@@ -48,12 +61,18 @@ class GameRepository : FirestoreHolder.AndroidFirestoreInterface {
             )
     }
 
+    /**
+     * Reset timer from beginning of the game to firestore.
+     */
     fun reinitialiseTimeFromBeginning() {
         db.collection(GameConstants.ROOMS)
             .document(BombLiveProperties.getInstance().gameId)
             .update(GameConstants.TIME_FROM_BEGINNING, 0F)
     }
 
+    /**
+     * Set the end of game time to firestore.
+     */
     override fun setEndOfGame(end: Int) {
         db.collection(GameConstants.ROOMS)
             .document(BombLiveProperties.getInstance().gameId)
@@ -70,6 +89,9 @@ class GameRepository : FirestoreHolder.AndroidFirestoreInterface {
         }
     }
 
+    /**
+     * Listen to live updates from firestore.
+     */
     fun listenToUpdates() {
         listenToCurrentBombOwner()
         listenToPlayerList()
@@ -77,6 +99,9 @@ class GameRepository : FirestoreHolder.AndroidFirestoreInterface {
         listenToTimeFromBeginning();
     }
 
+    /**
+     * Listen to the current bomb owner from firestore.
+     */
     private fun listenToCurrentBombOwner() {
         db.collection(GameConstants.ROOMS)
             .document(BombLiveProperties.getInstance().gameId)
@@ -88,8 +113,10 @@ class GameRepository : FirestoreHolder.AndroidFirestoreInterface {
             }
     }
 
+    /**
+     * Listen to the time from beginning of the game from firestore.
+     */
     private fun listenToTimeFromBeginning() {
-
         db.collection(GameConstants.ROOMS)
             .document(BombLiveProperties.getInstance().gameId)
             .addSnapshotListener { snapshot, e ->
@@ -113,6 +140,9 @@ class GameRepository : FirestoreHolder.AndroidFirestoreInterface {
             }
     }
 
+    /**
+     * Listen to the game's players list from firestore.
+     */
     private fun listenToPlayerList() {
         db.collection(GameConstants.ROOMS)
             .document(BombLiveProperties.getInstance().gameId)
@@ -127,6 +157,9 @@ class GameRepository : FirestoreHolder.AndroidFirestoreInterface {
             }
     }
 
+    /**
+     * Listen to the bomb's deltas from firestore.
+     */
     private fun listenToDelta() {
         db.collection(GameConstants.ROOMS)
             .document(BombLiveProperties.getInstance().gameId)

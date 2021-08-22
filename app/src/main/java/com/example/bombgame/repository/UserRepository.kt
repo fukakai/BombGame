@@ -28,12 +28,20 @@ class UserRepository private constructor() {
 
     fun getUserObserver() = userLiveData as LiveData<User>
 
+    /**
+     * Add a user to the users collection.
+     * @param user: The user to add.
+     */
     fun addUser(user: User) {
         db.collection(Constants.USERS_COLLECTION)
             .document(user.id)
             .set(user)
     }
 
+    /**
+     * Get a user from firestore using its ID.
+     * @param id: The user's ID.
+     */
     suspend fun getUser(id: String): User? {
         return db.collection(Constants.USERS_COLLECTION)
             .document(id)
@@ -42,12 +50,20 @@ class UserRepository private constructor() {
             .toObject()
     }
 
+    /**
+     * Update a user in firestore.
+     * @param user: The user to update.
+     */
     fun updateUser(user: User) {
         db.collection(Constants.USERS_COLLECTION)
             .document(user.id)
             .set(user)
     }
 
+    /**
+     * Delete a user from firestore using its ID.
+     * @param id: The user's ID.
+     */
     fun deleteUser(id: String) {
         db.collection(Constants.USERS_COLLECTION)
             .document(id)
@@ -60,12 +76,16 @@ class UserRepository private constructor() {
             }
     }
 
+    /**
+     * Listen to a user from firestore using its ID.
+     * @param id: The user's ID.
+     */
     fun listenToUser(id: String) {
         db.collection(Constants.USERS_COLLECTION)
             .document(id)
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
-                    Log.w(TAG, "Could not listen to rooms collection.", e)
+                    Log.w(TAG, "Could not listen user $id.", e)
                     return@addSnapshotListener
                 }
                 userLiveData.value = snapshot!!.toObject<User>()
