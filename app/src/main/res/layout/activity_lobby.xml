@@ -17,12 +17,12 @@
         android:textSize="30sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/pseudo_text"
+        app:layout_constraintBottom_toTopOf="@id/username_text_lobby"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="spread_inside"/>
 
     <EditText
-        android:id="@+id/pseudo_text"
+        android:id="@+id/username_text_lobby"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="@string/change_username"
@@ -30,16 +30,25 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/room_id"
-        app:layout_constraintBottom_toTopOf="@id/players_list_view"/>
+        app:layout_constraintBottom_toBottomOf="@id/ok_button_lobby"/>
+
+    <Button
+        android:id="@+id/ok_button_lobby"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/ok"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/username_text_lobby"
+        app:layout_constraintBottom_toTopOf="@id/players_list_view"
+        app:layout_constraintRight_toRightOf="parent"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/players_list_view"
         android:layout_width="match_parent"
         android:layout_height="400dp"
-        android:numColumns="2"
         android:verticalSpacing="24dp"
         app:layout_constraintBottom_toTopOf="@id/barrier3"
-        app:layout_constraintTop_toBottomOf="@id/pseudo_text"
+        app:layout_constraintTop_toBottomOf="@id/username_text_lobby"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 
@@ -48,7 +57,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="top"
-        app:constraint_referenced_ids="ready_button" />
+        app:constraint_referenced_ids="ready_button"/>
 
     <Button
         android:id="@+id/ready_button"

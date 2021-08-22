@@ -110,6 +110,16 @@ class RoomRepository private constructor() {
     }
 
     /**
+     * Update or add a player to a room in the firestore database.
+     * @param gameId The room ID.
+     * @param player The player to update.
+     */
+    fun updatePlayerUsername(gameId: String, currentUsername: String, player: Player) {
+        deletePlayerFromRoom(currentUsername, gameId)
+        updatePlayer(gameId, player)
+    }
+
+    /**
      * Delete all rooms from the firestore database.
      */
     fun deleteAllRooms() {
