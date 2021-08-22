@@ -12,8 +12,10 @@ import com.example.bombgame.utils.Constants.GREEN
 import com.example.bombgame.utils.Constants.RED
 import kotlinx.android.synthetic.main.lobby_grid_layout.view.*
 
-
-class LobbyAdapter(var playerList: List<Player>): RecyclerView.Adapter<LobbyAdapter.PlayerViewHolder>() {
+/**
+ * Adapter class to display the players in a RecyclerView in the lobby.
+ */
+class LobbyAdapter(private var playerList: List<Player>): RecyclerView.Adapter<LobbyAdapter.PlayerViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayerViewHolder {
         val playerView = LayoutInflater.from(parent.context).inflate(R.layout.lobby_grid_layout,
@@ -35,11 +37,18 @@ class LobbyAdapter(var playerList: List<Player>): RecyclerView.Adapter<LobbyAdap
 
     override fun getItemCount() = playerList.size
 
+    /**
+     * Update the players list to display.
+     * @param newPlayerList The players list that will replace the old one.
+     */
     fun update(newPlayerList: List<Player>) {
         playerList = newPlayerList
         this.notifyDataSetChanged()
     }
 
+    /**
+     * Class that represents one player in the RecyclerView.
+     */
     class PlayerViewHolder(playerView: View): RecyclerView.ViewHolder(playerView) {
         val usernameText: TextView = playerView.username_grid
         val readyText: TextView = playerView.ready_grid

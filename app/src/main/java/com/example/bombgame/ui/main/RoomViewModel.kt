@@ -98,30 +98,54 @@ class RoomViewModel(private val roomRepository: RoomRepository) : ViewModel() {
         }
     }
 
+    /**
+     * Call the roomRepository to update the startedGame indicator.
+     * @param gameId The room ID.
+     * @param value The value to update.
+     */
     fun updateStartedGame(gameId: String, value: Boolean) {
         roomRepository.updateStartedGame(gameId, value)
     }
 
+    /**
+     * Call the roomRepository to start listening to the rooms list from firestore.
+     */
+    fun listenToRoomList() {
+        roomRepository.listenToRoomList()
+    }
+
+    /**
+     * Call the roomRepository to start listening to a room.
+     * @param gameId The room ID.
+     */
     fun listenToRoom(gameId: String) {
         roomRepository.listenToRoom(gameId)
     }
 
+    /**
+     * Call the roomRepository to start listening to the players list in a room.
+     * @param gameId The room ID.
+     */
     fun listenToPlayerList(gameId: String) {
         roomRepository.listenToPlayerList(gameId)
     }
 
+    /**
+     * Call the roomRepository to unsubscribe from firestore.
+     * @param subscriptions The list of subscriptions to unsubscribe from.
+     */
     fun unsubscribe(subscriptions: List<Subscription>) {
         for (subscription in subscriptions) {
             roomRepository.unsubscribe(subscription)
         }
     }
 
+    /**
+     * Call the roomRepository to unsubscribe from firestore.
+     * @param subscription The subscription to unsubscribe from.
+     */
     fun unsubscribe(subscription: Subscription) {
         roomRepository.unsubscribe(subscription)
-    }
-
-    fun listenToRoomList() {
-        roomRepository.listenToRoomList()
     }
 }
 

@@ -47,8 +47,10 @@ class RoomRepository private constructor() {
     }
 
     /**
-     * Add a room to the firestore database.
+     * Add a room to the firestore database and add the player that created the room to
+     * the players list.
      * @param room The room to add
+     * @param player The player that created the room.
      */
     fun addRoom(room: Room, player: Player) {
         db.collection(ROOMS_COLLECTION)
@@ -89,8 +91,9 @@ class RoomRepository private constructor() {
     }
 
     /**
-     * Add a player to a room with the firestore database.
-     * @param room The player to add
+     * Update or add a player to a room in the firestore database.
+     * @param gameId The room ID.
+     * @param player The player to update.
      */
     fun updatePlayer(gameId: String, player: Player) {
         db.collection(ROOMS_COLLECTION)
@@ -124,9 +127,10 @@ class RoomRepository private constructor() {
     }
 
     /**
-     * Return a room from the firestore database.
+     * Indicate if a username is already taken in a room.
      * @param id the id of the room you want to get
-     * @return A room.
+     * @param username The player's username
+     * @return true if the username is taken else false.
      */
     suspend fun isUsernameTaken(id: String, username: String): Boolean {
         return try {
@@ -163,7 +167,8 @@ class RoomRepository private constructor() {
 
     /**
      * Delete a player of a room from the firestore database.
-     * @param id The id of the room to delete.
+     * @param playerUsername The deleted player's username.
+     * @param roomId The room ID to delete the player from.
      */
     fun deletePlayerFromRoom(playerUsername: String, roomId: String) {
         db.collection(ROOMS_COLLECTION)
@@ -179,12 +184,21 @@ class RoomRepository private constructor() {
             }
     }
 
+    /**
+     * Update the gameStarted value in firestore.
+     * @param gameId The current room ID.
+     * @param value Indicate if the game is started or not.
+     */
     fun updateStartedGame(gameId: String, value: Boolean) {
         db.collection(ROOMS_COLLECTION)
             .document(gameId)
             .update(GAME_STARTED_KEY, value)
     }
 
+    /**
+     * Listen to live updates of a room in firestore.
+     * @param gameId The current room ID.
+     */
     fun listenToRoom(gameId: String) {
         roomSubscription = db.collection(ROOMS_COLLECTION)
             .document(gameId)
@@ -197,6 +211,10 @@ class RoomRepository private constructor() {
             }
     }
 
+    /**
+     * Listen to live updates of the players list in a room in firestore.
+     * @param gameId The room ID.
+     */
     fun listenToPlayerList(gameId: String) {
         playerListSubscription = db.collection(ROOMS_COLLECTION)
             .document(gameId)
@@ -214,6 +232,10 @@ class RoomRepository private constructor() {
             }
     }
 
+    /**
+     * Unsubscribe from firestore.
+     * @param subscription The subscription to unsubscribe from.
+     */
     fun unsubscribe(subscription: Subscription) {
         when (subscription) {
             Subscription.ROOM_LIST -> roomListSubscription.remove()
