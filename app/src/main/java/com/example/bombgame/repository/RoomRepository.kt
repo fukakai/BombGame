@@ -215,7 +215,6 @@ class RoomRepository private constructor() {
     }
 
     fun unsubscribe(subscription: Subscription) {
-        println("UNSUB FROM $subscription")
         when (subscription) {
             Subscription.ROOM_LIST -> roomListSubscription.remove()
             Subscription.PLAYER_LIST -> roomSubscription.remove()

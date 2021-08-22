@@ -82,6 +82,11 @@ class RoomViewModel(private val roomRepository: RoomRepository) : ViewModel() {
      */
     fun deletePlayer(playerUsername: String, roomId: String) {
         roomRepository.deletePlayerFromRoom(playerUsername, roomId)
+
+        val currentPlayerList = playerListLiveData.value
+        if (currentPlayerList?.size == 1) {
+            roomRepository.deleteRoom(roomId)
+        }
     }
 
     fun switchReady(gameId: String, playerUsername: String) {
