@@ -6,8 +6,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.InputFilter
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
@@ -29,6 +27,7 @@ import com.example.bombgame.utils.RoomUtils
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,38 +40,22 @@ class MainActivity : AppCompatActivity() {
     private var roomList = listOf<Room>()
     private var currentRoom: Room? = null
     private var user: User = User()
+    private val providers = arrayListOf(
+        AuthUI.IdpConfig.GoogleBuilder().build(),
+        AuthUI.IdpConfig.FacebookBuilder().build()
+    )
+
     private lateinit var roomFactory: RoomViewModelFactory
     private lateinit var roomViewModel: RoomViewModel
     private lateinit var userFactory: UserViewModelFactory
     private lateinit var userViewModel: UserViewModel
     private lateinit var mainHandler: Handler
-    private lateinit var usernameText: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
-        println("TRIGGER CREATE MAIN")
         mainHandler = Handler(Looper.getMainLooper())
-
-        val createButton = findViewById<Button>(R.id.create_room_button)
-        val deleteButton = findViewById<Button>(R.id.delete_button)
-        val findButton = findViewById<Button>(R.id.find_game_button)
-        val gameButton = findViewById<Button>(R.id.game_button)
-        val logInButton = findViewById<Button>(R.id.log_in_button)
-        val logOutButton = findViewById<Button>(R.id.log_out_button)
-        findButton.isEnabled = false
-        createButton.isEnabled = false
-
-        val idText = findViewById<EditText>(R.id.game_id_text)
-        usernameText = findViewById(R.id.username_text)
-
-        // Choose authentication providers
-        val providers = arrayListOf(
-            AuthUI.IdpConfig.GoogleBuilder().build(),
-            AuthUI.IdpConfig.FacebookBuilder().build()
-        )
 
         // Create and launch sign-in intent
         startActivityForResult(
@@ -83,68 +66,82 @@ class MainActivity : AppCompatActivity() {
             RC_SIGN_IN
         )
 
-        roomFactory = InjectorUtils.provideRoomViewModelFactory()
-        roomViewModel = ViewModelProvider(this, roomFactory)
-            .get(RoomViewModel::class.java)
-        roomViewModel.getRoomListObserver().observe(this, Observer {
-            roomList = it
-        })
+        initializeViewModels()
+        initializeButtons()
+        initializeTexts()
+    }
 
-        roomViewModel.getCurrentRoomObserver().observe(this, Observer {
-            currentRoom = it
-        })
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
 
-        userFactory = InjectorUtils.provideUserViewModelFactory()
-        userViewModel = ViewModelProvider(this, userFactory)
-            .get(UserViewModel::class.java)
-        userViewModel.getUserObserver().observe(this, Observer {
-            if (it != null) {
-                user = it
+        if (requestCode == RC_SIGN_IN) {
+            val response = IdpResponse.fromResultIntent(data)
+
+            if (resultCode == Activity.RESULT_OK) {
+                user.id = FirebaseAuth.getInstance().currentUser?.uid.toString()
+                CoroutineScope(EmptyCoroutineContext).launch {
+                    user.username =
+                        userViewModel.getUser(user.id)?.username.toString()
+                    mainHandler.post { username_text.setText(user.username) }
+                }
+                userViewModel.addUser(user)
             }
-        })
+        }
+    }
 
-        gameButton.setOnClickListener {
+    /**
+     * Starts the lobby activity. Subscribe to the room and the players list. Unsubscribe from the
+     * rooms list.
+     */
+    private fun goToLobby(playerId: String, roomId: String) {
+        val intent = Intent(this, LobbyActivity::class.java)
+        intent.putExtra(PLAYER_USERNAME_KEY, playerId)
+        intent.putExtra(ROOM_ID_KEY, roomId)
+        roomViewModel.listenToRoom(roomId)
+        roomViewModel.listenToPlayerList(roomId)
+        roomViewModel.unsubscribe(Subscription.ROOM_LIST)
+        startActivity(intent)
+    }
+
+    /**
+     * Indicate if the user is logged in with google / facebook.
+     */
+    private fun isLoggedIn(): Boolean {
+        return user.id != ""
+    }
+
+    /**
+     * Initialize the buttons for the main activity.
+     */
+    private fun initializeButtons() {
+        game_button.setOnClickListener {
             val intent = Intent(this, GameActivity::class.java)
             startActivity(intent);
         }
 
-        idText.filters =
-            arrayOf(InputFilter.AllCaps(), InputFilter.LengthFilter(Constants.MAX_LENGTH_ROOM_ID))
-        idText.addTextChangedListener {
-            findButton.isEnabled =
-                it.toString().length == 6 && usernameText.text.toString().isNotBlank()
-        }
-
-        usernameText.filters = arrayOf(InputFilter.LengthFilter(Constants.MAX_LENGTH_USERNAME))
-        usernameText.addTextChangedListener {
-            findButton.isEnabled = it.toString()
-                .isNotBlank() && idText.text.toString().length == Constants.MAX_LENGTH_ROOM_ID
-            createButton.isEnabled = it.toString().isNotBlank()
-        }
-
-        createButton.setOnClickListener {
-            userViewModel.updateUser(user, usernameText.text.toString())
+        create_room_button.setOnClickListener {
+            userViewModel.updateUser(user, username_text.text.toString())
             val list = roomViewModel.addRoom(user)
             goToLobby(list[0], list[1])
         }
 
-        deleteButton.setOnClickListener {
+        delete_button.setOnClickListener {
             roomViewModel.deleteAllRooms()
         }
 
-        gameButton.setOnClickListener {
+        game_button.setOnClickListener {
             val intent = Intent(this, GameActivity::class.java)
             startActivity(intent);
         }
 
-        findButton.setOnClickListener {
-            val gameId = idText.text.toString()
+        find_game_button.setOnClickListener {
+            val gameId = game_id_text.text.toString()
 
             if (RoomUtils.isExistingRoom(gameId, roomList)) {
                 if (isLoggedIn()) {
-                    userViewModel.updateUser(user, usernameText.text.toString())
+                    userViewModel.updateUser(user, username_text.text.toString())
                 } else {
-                    user.username = usernameText.text.toString()
+                    user.username = username_text.text.toString()
                 }
                 var usernameTaken: Boolean
                 CoroutineScope(EmptyCoroutineContext).launch {
@@ -169,7 +166,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        logInButton.setOnClickListener {
+        log_in_button.setOnClickListener {
             startActivityForResult(
                 AuthUI.getInstance()
                     .createSignInIntentBuilder()
@@ -179,42 +176,57 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        logOutButton.setOnClickListener {
+        log_out_button.setOnClickListener {
             AuthUI.getInstance()
                 .signOut(this)
             user = User()
         }
+
+        find_game_button.isEnabled = false
+        create_room_button.isEnabled = false
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    /**
+     * Initialize the viewModels for the main activity.
+     */
+    private fun initializeViewModels() {
+        roomFactory = InjectorUtils.provideRoomViewModelFactory()
+        roomViewModel = ViewModelProvider(this, roomFactory)
+            .get(RoomViewModel::class.java)
+        roomViewModel.getRoomListObserver().observe(this, Observer {
+            roomList = it
+        })
 
-        if (requestCode == RC_SIGN_IN) {
-            val response = IdpResponse.fromResultIntent(data)
+        roomViewModel.getCurrentRoomObserver().observe(this, Observer {
+            currentRoom = it
+        })
 
-            if (resultCode == Activity.RESULT_OK) {
-                user.id = FirebaseAuth.getInstance().currentUser?.uid.toString()
-                CoroutineScope(EmptyCoroutineContext).launch {
-                    user.username =
-                        userViewModel.getUser(user.id)?.username.toString()
-                    mainHandler.post { usernameText.setText(user.username) }
-                }
-                userViewModel.addUser(user)
+        userFactory = InjectorUtils.provideUserViewModelFactory()
+        userViewModel = ViewModelProvider(this, userFactory)
+            .get(UserViewModel::class.java)
+        userViewModel.getUserObserver().observe(this, Observer {
+            if (it != null) {
+                user = it
             }
+        })
+    }
+
+    /**
+     * Initialize the texts for the main activity.
+     */
+    private fun initializeTexts() {
+        game_id_text.filters =
+            arrayOf(InputFilter.AllCaps(), InputFilter.LengthFilter(Constants.MAX_LENGTH_ROOM_ID))
+        game_id_text.addTextChangedListener {
+            find_game_button.isEnabled =
+                it.toString().length == 6 && username_text.text.toString().isNotBlank()
         }
-    }
 
-    private fun goToLobby(playerId: String, roomId: String) {
-        val intent = Intent(this, LobbyActivity::class.java)
-        intent.putExtra(PLAYER_USERNAME_KEY, playerId)
-        intent.putExtra(ROOM_ID_KEY, roomId)
-        roomViewModel.listenToRoom(roomId)
-        roomViewModel.listenToPlayerList(roomId)
-        roomViewModel.unsubscribe(Subscription.ROOM_LIST)
-        startActivity(intent)
-    }
-
-    private fun isLoggedIn(): Boolean {
-        return user.id != ""
+        username_text.filters = arrayOf(InputFilter.LengthFilter(Constants.MAX_LENGTH_USERNAME))
+        username_text.addTextChangedListener {
+            find_game_button.isEnabled = it.toString()
+                .isNotBlank() && game_id_text.text.toString().length == Constants.MAX_LENGTH_ROOM_ID
+            create_room_button.isEnabled = it.toString().isNotBlank()
+        }
     }
 }

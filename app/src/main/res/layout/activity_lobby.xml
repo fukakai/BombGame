@@ -30,13 +30,13 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/room_id"
-        app:layout_constraintBottom_toTopOf="@id/players_list"/>
+        app:layout_constraintBottom_toTopOf="@id/players_list_view"/>
 
-    <GridView
-        android:id="@+id/players_list"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/players_list_view"
         android:layout_width="match_parent"
         android:layout_height="400dp"
-        android:numColumns="auto_fit"
+        android:numColumns="2"
         android:verticalSpacing="24dp"
         app:layout_constraintBottom_toTopOf="@id/barrier3"
         app:layout_constraintTop_toBottomOf="@id/pseudo_text"
