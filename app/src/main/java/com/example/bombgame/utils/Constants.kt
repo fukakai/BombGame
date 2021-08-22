@@ -11,4 +11,8 @@ object Constants {
     const val ROOM_ID_KEY = "roomId"
     const val PLAYER_LIST_COLLECTION = "playerList"
     const val GAME_STARTED_KEY = "gameStarted"
+    const val GREEN = "#3fd444"
+    const val RED = "#c02d2d"
+    const val READY_TRUE = "Ready !"
+    const val READY_FALSE = "Ready ?"
 }

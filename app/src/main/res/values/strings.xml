@@ -11,7 +11,7 @@
     <string name="log_in">LOG IN</string>
     <string name="username">Username</string>
     <string name="log_out">LOG OUT</string>
-    <string name="ready">Ready</string>
+    <string name="ready">Ready ?</string>
     <string name="leave">Leave</string>
     <string name="change_username">Change your username</string>
     <string name="players_list">Players list</string>
