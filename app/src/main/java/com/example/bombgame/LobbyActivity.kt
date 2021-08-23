@@ -35,6 +35,7 @@ class LobbyActivity : AppCompatActivity() {
     private lateinit var userViewModel: UserViewModel
     private var playerList: List<Player> = mutableListOf()
     private var ready = false
+    private var roomLoaded = false
     private var gameAlreadyStarted = false
     private val playerListAdapter = LobbyAdapter(playerList)
 
@@ -132,21 +133,25 @@ class LobbyActivity : AppCompatActivity() {
 
         roomViewModel.getCurrentRoomObserver().observe(this, Observer {
 
-            if (it == null) {
+            if (it != null && !roomLoaded) {
+                roomLoaded = true
+            } else if (it == null && roomLoaded) {
                 Toast.makeText(this, "This room no longer exists !", Toast.LENGTH_SHORT).show()
                 finish()
-            } else if (it.gameStarted && !gameAlreadyStarted) {
+            } else if (roomLoaded && it.gameStarted && !gameAlreadyStarted) {
                 gameAlreadyStarted = true
                 startGameActivity(playerUsername, roomId)
             }
         })
 
         roomViewModel.getPlayerListObserver().observe(this, Observer { list ->
-            playerList = list
-            playerListAdapter.update(playerList)
-            val player = playerList.find { it.username == playerUsername }
-            if (player != null) {
-                ready = player.ready
+            if (list != null) {
+                playerList = list
+                playerListAdapter.update(playerList)
+                val player = playerList.find { it.username == playerUsername }
+                if (player != null) {
+                    ready = player.ready
+                }
             }
 
             ready_button.setBackgroundColor(if (ready) Color.parseColor(GREEN) else Color.parseColor(

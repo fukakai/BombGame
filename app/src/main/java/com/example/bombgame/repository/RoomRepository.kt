@@ -249,8 +249,14 @@ class RoomRepository private constructor() {
     fun unsubscribe(subscription: Subscription) {
         when (subscription) {
             Subscription.ROOM_LIST -> roomListSubscription.remove()
-            Subscription.PLAYER_LIST -> roomSubscription.remove()
-            Subscription.ROOM -> roomSubscription.remove()
+            Subscription.PLAYER_LIST -> {
+                playerListSubscription.remove()
+                playerListLiveData.value = null
+            }
+            Subscription.ROOM -> {
+                roomSubscription.remove()
+                currentRoomLiveData.value = null
+            }
         }
     }
 }

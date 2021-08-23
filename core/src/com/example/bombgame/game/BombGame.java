@@ -76,7 +76,7 @@ public class BombGame extends ApplicationAdapter {
     bombDrawer.dispose();
     bombDrawer.getBombNormalTexture().dispose();
     bombDrawer.getBombExplosionTexture().dispose();
-    BombLiveProperties.getInstance().reset();
+    bombLiveProperties.reset();
   }
 
   /** Give random directions to start */
