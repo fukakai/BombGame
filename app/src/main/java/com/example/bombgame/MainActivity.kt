@@ -192,7 +192,9 @@ class MainActivity : AppCompatActivity() {
         roomViewModel = ViewModelProvider(this, roomFactory)
             .get(RoomViewModel::class.java)
         roomViewModel.getRoomListObserver().observe(this, Observer {
-            roomList = it
+            if (it != null) {
+                roomList = it
+            }
         })
 
         roomViewModel.getCurrentRoomObserver().observe(this, Observer {
