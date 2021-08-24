@@ -7,9 +7,9 @@ import android.os.Handler
 import android.os.Looper
 import android.text.InputFilter
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.bombgame.data.dto.Room
 import com.example.bombgame.data.dto.User
@@ -18,14 +18,11 @@ import com.example.bombgame.ui.main.RoomViewModel
 import com.example.bombgame.ui.main.UserViewModel
 import com.example.bombgame.utils.Constants
 import com.example.bombgame.utils.Constants.PLAYER_USERNAME_KEY
-import com.example.bombgame.utils.Constants.RC_SIGN_IN
 import com.example.bombgame.utils.Constants.ROOM_ID_KEY
 import com.example.bombgame.utils.Constants.USER
 import com.example.bombgame.utils.InjectorUtils
 import com.example.bombgame.utils.RoomUtils
 import com.firebase.ui.auth.AuthUI
-import com.firebase.ui.auth.IdpResponse
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +40,11 @@ class MainActivity : AppCompatActivity() {
         AuthUI.IdpConfig.GoogleBuilder().build(),
         AuthUI.IdpConfig.FacebookBuilder().build()
     )
+    private val loginLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            saveUser()
+        }
+    }
 
     private lateinit var roomViewModel: RoomViewModel
     private lateinit var userViewModel: UserViewModel
@@ -54,35 +56,30 @@ class MainActivity : AppCompatActivity() {
 
         mainHandler = Handler(Looper.getMainLooper())
 
-        // Create and launch sign-in intent
-        startActivityForResult(
-            AuthUI.getInstance()
-                .createSignInIntentBuilder()
-                .setAvailableProviders(providers)
-                .build(),
-            RC_SIGN_IN
-        )
-
         initializeViewModels()
         initializeButtons()
         initializeTexts()
+        if (!isLoggedIn()) {
+            login()
+        }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    /**
+     * Starts the login process.
+     */
+    private fun login() {
+        loginLauncher.launch(AuthUI.getInstance()
+            .createSignInIntentBuilder()
+            .setAvailableProviders(providers)
+            .build())
+    }
 
-        if (requestCode == RC_SIGN_IN) {
-            val response = IdpResponse.fromResultIntent(data)
-
-            if (resultCode == Activity.RESULT_OK) {
-                user.id = FirebaseAuth.getInstance().currentUser?.uid.toString()
-                CoroutineScope(EmptyCoroutineContext).launch {
-                    user.username =
-                        userViewModel.getUser(user.id)?.username.toString()
-                    mainHandler.post { username_text.setText(user.username) }
-                }
-                userViewModel.addUser(user)
-            }
+    /**
+     * Saves the user in firestore and update the username text with his username.
+     */
+    private fun saveUser() {
+        CoroutineScope(EmptyCoroutineContext).launch {
+            user = userViewModel.saveUser()
         }
     }
 
@@ -165,13 +162,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         log_in_button.setOnClickListener {
-            startActivityForResult(
-                AuthUI.getInstance()
-                    .createSignInIntentBuilder()
-                    .setAvailableProviders(providers)
-                    .build(),
-                RC_SIGN_IN
-            )
+            if (!isLoggedIn()) {
+                login()
+            } else {
+                Toast.makeText(this,
+                    "You are already logged in as ${user.username}!",
+                    Toast.LENGTH_SHORT).show()
+            }
         }
 
         log_out_button.setOnClickListener {
@@ -191,22 +188,23 @@ class MainActivity : AppCompatActivity() {
         val roomFactory = InjectorUtils.provideRoomViewModelFactory()
         roomViewModel = ViewModelProvider(this, roomFactory)
             .get(RoomViewModel::class.java)
-        roomViewModel.getRoomListObserver().observe(this, Observer {
+        roomViewModel.getRoomListObserver().observe(this, {
             if (it != null) {
                 roomList = it
             }
         })
 
-        roomViewModel.getCurrentRoomObserver().observe(this, Observer {
+        roomViewModel.getCurrentRoomObserver().observe(this, {
             currentRoom = it
         })
 
         val userFactory = InjectorUtils.provideUserViewModelFactory()
         userViewModel = ViewModelProvider(this, userFactory)
             .get(UserViewModel::class.java)
-        userViewModel.getUserObserver().observe(this, Observer {
+        userViewModel.getUserObserver().observe(this, {
             if (it != null) {
                 user = it
+                username_text.setText(user.username)
             }
         })
     }
