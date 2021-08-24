@@ -4,33 +4,38 @@ import com.example.bombgame.data.dto.Room
 
 object RoomUtils {
 
-    private val alphabet = listOf(
+    private val vowels = listOf(
         "A",
+        "E",
+        "I",
+        "O",
+        "U",
+        "Y"
+    )
+
+    private val consonants = listOf(
         "B",
         "C",
         "D",
-        "E",
         "F",
         "G",
         "H",
-        "I",
         "J",
         "K",
         "L",
         "M",
         "N",
-        "O",
         "P",
         "Q",
         "R",
         "S",
         "T",
-        "U",
         "V",
         "X",
-        "Y",
         "Z"
     )
+
+    private val alphabet = listOf(vowels, consonants)
 
     /**
      * Generate a random id for a room.
@@ -38,8 +43,14 @@ object RoomUtils {
      */
     fun generateId(): String {
         var id = ""
+        val startingType = alphabet.random()
+        val secondType = if (startingType == vowels) consonants else vowels
         for (x in 0 until 6) {
-            id += alphabet.random()
+            id += if (x % 2 == 0) {
+                startingType.random()
+            } else {
+                secondType.random()
+            }
         }
         return id
     }
