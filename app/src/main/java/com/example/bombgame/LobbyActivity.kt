@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.bombgame.data.dto.Player
@@ -131,7 +130,7 @@ class LobbyActivity : AppCompatActivity() {
         userViewModel = ViewModelProvider(this, userFactory)
             .get(UserViewModel::class.java)
 
-        roomViewModel.getCurrentRoomObserver().observe(this, Observer {
+        roomViewModel.getCurrentRoomObserver().observe(this, {
 
             if (it != null && !roomLoaded) {
                 roomLoaded = true
@@ -144,7 +143,7 @@ class LobbyActivity : AppCompatActivity() {
             }
         })
 
-        roomViewModel.getPlayerListObserver().observe(this, Observer { list ->
+        roomViewModel.getPlayerListObserver().observe(this, { list ->
             if (list != null) {
                 playerList = list
                 playerListAdapter.update(playerList)
