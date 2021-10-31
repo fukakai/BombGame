@@ -16,6 +16,7 @@ public class PlayersDrawer extends ShapeRenderer {
 
   private BombLiveProperties bombLiveProperties = BombLiveProperties.getInstance();
   private ArrayList<PlayerGridModel> playersGridUnpicked = new ArrayList<>();
+  private BombIconDrawer bombIconDrawer = new BombIconDrawer();
 
   public PlayersDrawer() {
     playersGridInit();
@@ -23,115 +24,126 @@ public class PlayersDrawer extends ShapeRenderer {
 
   public void playersGridInit() {
 
-    bombLiveProperties.getPlayersGrid()
-        .add(PlayersPositionEnum.GAUCHE_HAUT.ordinal(), new PlayerGridModel()
-        .withPlayersPositionEnum(PlayersPositionEnum.GAUCHE_HAUT)
-        .withColor(Color.BLUE)
-        .withRectangle(new Rectangle(
-            0,
-            bombLiveProperties.getScreenHeight(),
-            BombConstants.PLAYER_THICKNESS,
-            -bombLiveProperties.getScreenHeight() /3
-        )));
+    bombLiveProperties
+        .getPlayersGrid()
+        .add(
+            PlayersPositionEnum.GAUCHE_HAUT.ordinal(),
+            new PlayerGridModel(
+                PlayersPositionEnum.GAUCHE_HAUT,
+                Color.BLUE,
+                new Rectangle(
+                    0,
+                    bombLiveProperties.getScreenHeight() * 2 / 3,
+                    BombConstants.PLAYER_THICKNESS,
+                    bombLiveProperties.getScreenHeight() / 3)));
 
-    bombLiveProperties.getPlayersGrid()
-        .add(new PlayerGridModel()
-        .withPlayersPositionEnum(PlayersPositionEnum.GAUCHE_MILIEU)
-        .withColor(Color.GREEN)
-        .withRectangle(new Rectangle(
-            0,
-            bombLiveProperties.getScreenHeight()*2/3,
-            BombConstants.PLAYER_THICKNESS,
-            -bombLiveProperties.getScreenHeight() /3
-        )));
+    bombLiveProperties
+        .getPlayersGrid()
+        .add(
+            new PlayerGridModel(
+                PlayersPositionEnum.GAUCHE_MILIEU,
+                Color.GREEN,
+                new Rectangle(
+                    0,
+                    bombLiveProperties.getScreenHeight() / 3,
+                    BombConstants.PLAYER_THICKNESS,
+                    bombLiveProperties.getScreenHeight() / 3)));
 
-    bombLiveProperties.getPlayersGrid()
-        .add(new PlayerGridModel()
-        .withPlayersPositionEnum(PlayersPositionEnum.GAUCHE_BAS)
-        .withColor(Color.YELLOW)
-        .withRectangle(new Rectangle(
-            0,
-            bombLiveProperties.getScreenHeight() /3,
-            BombConstants.PLAYER_THICKNESS,
-            -bombLiveProperties.getScreenHeight() /3
-        )));
+    bombLiveProperties
+        .getPlayersGrid()
+        .add(
+            new PlayerGridModel(
+                PlayersPositionEnum.GAUCHE_BAS,
+                Color.YELLOW,
+                new Rectangle(
+                    0,
+                    0,
+                    BombConstants.PLAYER_THICKNESS,
+                    bombLiveProperties.getScreenHeight() / 3)));
 
-    bombLiveProperties.getPlayersGrid()
-        .add(new PlayerGridModel()
-        .withPlayersPositionEnum(PlayersPositionEnum.BAS_GAUCHE)
-        .withColor(Color.BROWN)
-        .withRectangle(new Rectangle(
-            0,
-            0,
-            bombLiveProperties.getScreenWidth() /2,
-            BombConstants.PLAYER_THICKNESS
-        )));
+    bombLiveProperties
+        .getPlayersGrid()
+        .add(
+            new PlayerGridModel(
+                PlayersPositionEnum.BAS_GAUCHE,
+                Color.BROWN,
+                new Rectangle(
+                    0,
+                    0,
+                    bombLiveProperties.getScreenWidth() / 2,
+                    BombConstants.PLAYER_THICKNESS)));
 
-    bombLiveProperties.getPlayersGrid()
-        .add(new PlayerGridModel()
-        .withPlayersPositionEnum(PlayersPositionEnum.BAS_DROITE)
-        .withColor(Color.MAGENTA)
-        .withRectangle(new Rectangle(
-            bombLiveProperties.getScreenWidth() /2,
-            0,
-            bombLiveProperties.getScreenWidth() /2,
-            BombConstants.PLAYER_THICKNESS
-        )));
+    bombLiveProperties
+        .getPlayersGrid()
+        .add(
+            new PlayerGridModel(
+                PlayersPositionEnum.BAS_DROITE,
+                Color.MAGENTA,
+                new Rectangle(
+                    bombLiveProperties.getScreenWidth() / 2,
+                    0,
+                    bombLiveProperties.getScreenWidth() / 2,
+                    BombConstants.PLAYER_THICKNESS)));
 
-    bombLiveProperties.getPlayersGrid()
-        .add(new PlayerGridModel()
-        .withPlayersPositionEnum(PlayersPositionEnum.DROITE_BAS)
-        .withColor(Color.BLACK)
-        .withRectangle(new Rectangle(
-            bombLiveProperties.getScreenWidth(),
-            0,
-            -BombConstants.PLAYER_THICKNESS,
-            bombLiveProperties.getScreenHeight() /3
-        )));
+    bombLiveProperties
+        .getPlayersGrid()
+        .add(
+            new PlayerGridModel(
+                PlayersPositionEnum.DROITE_BAS,
+                Color.BLACK,
+                new Rectangle(
+                    bombLiveProperties.getScreenWidth() - BombConstants.PLAYER_THICKNESS,
+                    0,
+                    BombConstants.PLAYER_THICKNESS,
+                    bombLiveProperties.getScreenHeight() / 3)));
 
-    bombLiveProperties.getPlayersGrid()
-        .add(new PlayerGridModel()
-        .withPlayersPositionEnum(PlayersPositionEnum.DROITE_MILIEU)
-        .withColor(Color.CYAN)
-        .withRectangle(new Rectangle(
-            bombLiveProperties.getScreenWidth(),
-            bombLiveProperties.getScreenHeight() /3,
-            -BombConstants.PLAYER_THICKNESS,
-            bombLiveProperties.getScreenHeight() /3
-        )));
+    bombLiveProperties
+        .getPlayersGrid()
+        .add(
+            new PlayerGridModel(
+                PlayersPositionEnum.DROITE_MILIEU,
+                Color.CYAN,
+                new Rectangle(
+                    bombLiveProperties.getScreenWidth() - BombConstants.PLAYER_THICKNESS,
+                    bombLiveProperties.getScreenHeight() / 3,
+                    BombConstants.PLAYER_THICKNESS,
+                    bombLiveProperties.getScreenHeight() / 3)));
 
-    bombLiveProperties.getPlayersGrid()
-        .add(new PlayerGridModel()
-        .withPlayersPositionEnum(PlayersPositionEnum.DROITE_HAUT)
-        .withColor(Color.ORANGE)
-        .withRectangle(new Rectangle(
-            bombLiveProperties.getScreenWidth(),
-            bombLiveProperties.getScreenHeight()*2/3,
-            -BombConstants.PLAYER_THICKNESS,
-            bombLiveProperties.getScreenHeight() /3
-        )));
+    bombLiveProperties
+        .getPlayersGrid()
+        .add(
+            new PlayerGridModel(
+                PlayersPositionEnum.DROITE_HAUT,
+                Color.ORANGE,
+                new Rectangle(
+                    bombLiveProperties.getScreenWidth() - BombConstants.PLAYER_THICKNESS,
+                    bombLiveProperties.getScreenHeight() * 2 / 3,
+                    BombConstants.PLAYER_THICKNESS,
+                    bombLiveProperties.getScreenHeight() / 3)));
 
-    bombLiveProperties.getPlayersGrid()
-        .add(new PlayerGridModel()
-        .withPlayersPositionEnum(PlayersPositionEnum.HAUT_DROITE)
-        .withColor(Color.DARK_GRAY)
-        .withRectangle(new Rectangle(
-            bombLiveProperties.getScreenWidth(),
-            bombLiveProperties.getScreenHeight(),
-            -bombLiveProperties.getScreenWidth() /2,
-            -BombConstants.PLAYER_THICKNESS
-            )));
+    bombLiveProperties
+        .getPlayersGrid()
+        .add(
+            new PlayerGridModel(
+                PlayersPositionEnum.HAUT_DROITE,
+                Color.DARK_GRAY,
+                new Rectangle(
+                    bombLiveProperties.getScreenWidth() / 2,
+                    bombLiveProperties.getScreenHeight() - BombConstants.PLAYER_THICKNESS,
+                    bombLiveProperties.getScreenWidth() / 2,
+                    BombConstants.PLAYER_THICKNESS)));
 
-    bombLiveProperties.getPlayersGrid()
-        .add(new PlayerGridModel()
-        .withPlayersPositionEnum(PlayersPositionEnum.HAUT_GAUCHE)
-        .withColor(Color.NAVY)
-        .withRectangle(new Rectangle(
-            bombLiveProperties.getScreenWidth() /2,
-            bombLiveProperties.getScreenHeight(),
-            -bombLiveProperties.getScreenWidth(),
-            -BombConstants.PLAYER_THICKNESS
-        )));
+    bombLiveProperties
+        .getPlayersGrid()
+        .add(
+            new PlayerGridModel(
+                PlayersPositionEnum.HAUT_GAUCHE,
+                Color.NAVY,
+                new Rectangle(
+                    0,
+                    bombLiveProperties.getScreenHeight() - BombConstants.PLAYER_THICKNESS,
+                    bombLiveProperties.getScreenWidth() / 2,
+                    BombConstants.PLAYER_THICKNESS)));
 
     playersGridUnpicked.addAll(bombLiveProperties.getPlayersGrid());
   }
@@ -153,14 +165,12 @@ public class PlayersDrawer extends ShapeRenderer {
       List<String> otherPlayersList = bombLiveProperties.getPlayerList();
       otherPlayersList.remove(bombLiveProperties.getLocalPlayer());
       for (String playerId : otherPlayersList) {
-          drawPlayer(playerId, getRandomPlayerGridModel(playerId));
+        drawPlayer(playerId, getRandomPlayerGridModel(playerId));
       }
     }
   }
 
-  /**
-   * Draws the bomb at its normal state
-   */
+  /** Draws the bomb at its normal state */
   public void drawPlayer(String player, PlayerGridModel playerGridModel) {
     this.setColor(playerGridModel.getColor());
     this.begin(ShapeType.Filled);
@@ -169,6 +179,9 @@ public class PlayersDrawer extends ShapeRenderer {
         playerGridModel.getRectangle().getY(),
         playerGridModel.getRectangle().getWidth(),
         playerGridModel.getRectangle().getHeight());
+    if (this.bombLiveProperties.getCurrentBombOwner().equals(player)) {
+      bombIconDrawer.drawBombIcon(playerGridModel);
+    }
     this.end();
   }
 
@@ -179,14 +192,16 @@ public class PlayersDrawer extends ShapeRenderer {
     int size = playersGridUnpicked.size();
     int randomInt = random.nextInt(size);
 
-    PlayerGridModel playerPicked = playersGridUnpicked
-        .get(randomInt).withPlayerId(player);
+    PlayerGridModel playerPicked = playersGridUnpicked.get(randomInt).withPlayerId(player);
 
     // Remove the player from the unpicked players list
     playersGridUnpicked.remove(randomInt);
 
     // update id in the playersGrid
-    bombLiveProperties.getPlayersGrid().get(playerPicked.getPlayersPositionEnum().ordinal()).setPlayerId(player);
+    bombLiveProperties
+        .getPlayersGrid()
+        .get(playerPicked.getPlayersPosition().ordinal())
+        .setPlayerId(player);
 
     return playerPicked;
   }
