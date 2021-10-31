@@ -2,6 +2,7 @@ package com.example.bombgame.game.data;
 
 import com.example.bombgame.game.modele.Coordinates;
 import com.example.bombgame.game.modele.PlayerGridModel;
+
 import java.util.ArrayList;
 
 /**
@@ -26,6 +27,8 @@ public class BombLiveProperties {
   private float bombScaleX = 1;
   private float bombScaleY = 1;
   private int bombWidth = 300;
+  private float bombIconScale = 0.25f;
+  private int bombIconWidth = (int) (bombWidth * bombIconScale);
   private int bombHeight = bombWidth;
   private int bombMaxSize = bombWidth + 50;
   private int bombMinSize = bombWidth - 50;
@@ -330,4 +333,20 @@ public class BombLiveProperties {
         .withX(bombX+bombWidth/2)
         .withY(bombY+bombHeight);
   }
+  public float getBombIconScale() {
+    return bombIconScale;
+  }
+
+  public void setBombIconScale(float bombIconScale) {
+    this.bombIconScale = bombIconScale;
+  }
+
+  public int getBombIconWidth() {
+    return bombIconWidth;
+  }
+
+  public void setBombIconWidth(int bombIconWidth) {
+    this.bombIconWidth = bombIconWidth;
+  }
+
 }
